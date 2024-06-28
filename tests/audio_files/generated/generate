@@ -1,0 +1,92 @@
+#!/bin/bash
+# Generate audio files from a list in a csv
+#
+# @author Aonghus Storey
+#
+
+GAIN_ADJUST="-12" #Sox defaults to full DB level
+
+usage() {
+    printf "A script to generate multiple audio files using Sox\n"
+    printf "Usage: ${0} CSV_FILENAME\n"
+}
+
+##
+# Output the frequency value which is $2 cents higher than $1
+##
+cents_from() {
+    printf $(bc -l <<< "${1} * e(${2}/1200*l(2))")
+}
+
+##
+# Output a list of frequencies from a root frequency $1 and an arbitrary number of cents values in the following arguments.
+# @param $1 the starting frequency
+# @params $2...$n intervals in cents (from the given frequency)
+##
+list_freqs() {
+    root=$1;
+    freqs=();
+
+    for arg in "${@:2}"; do
+        freqs+=( $(cents_from $root $arg) );
+    done
+
+    printf "%.4f " "${freqs[@]}";
+}
+
+##
+# Generate an audio file with Sox.
+# @param $1 the target filename
+# @param $2 the duration A single number or string parsable as an array.
+#                        If it's an array, the durations will be iterated through and looped if necessary
+# @param $3 the waveform (sine, square, triangle, sawtooth,trapezium, exp)
+# @param $4 a list of frequencies (space separated)
+##
+generate_file() {
+    echo "Generating ${1}"
+    read -a freqs <<< "${4}"
+    read -a times <<< "${2}"
+
+    #times is an array (possibly with 1 entry). Redundant, but we can loop it either way.
+    times_idx=0
+    notes=""
+    for f in "${freqs[@]}"; do
+        notes+="synth ${times[times_idx]} ${3} ${f} gain ${GAIN_ADJUST} : "
+        times_idx=$((times_idx + 1))
+
+        #If eq array length, loop back
+        if [ $times_idx -eq ${#times[@]} ]; then
+            times_idx=0
+        fi
+    done
+    notes=${notes::-2} ##cut off the trailing separator
+    sox -n "${1}" ${notes}
+}
+
+if [ -z $1 ]; then
+    usage
+    exit 1
+fi
+
+
+
+
+#Start the output CSV
+printf "filename,duration,waveform,root_freq,intervals,target_frequencies\n" > output.csv
+
+declare -A root_pitches
+root_pitches["A0"]="27.5"
+root_pitches+=( ["A1"]="55" ["A2"]="110" ["A3"]="220" ["A4"]="440" ["A5"]="880" ["A6"]="1760" ["A7"]="3520" )
+
+#Read in the csv and generate files
+while IFS="," read -r filename duration waveform intervals oct
+do
+    read -a octaves <<< "${oct}"
+    #Generate for each octave indicated octave
+    for root in ${octaves[@]}; do
+        file="${filename}-${waveform}-${root}.wav"
+        frequencies=$(list_freqs ${root_pitches[${root}]} ${intervals})
+        printf "${file},${duration},${waveform},${root},${intervals},${frequencies}\n" >> output.csv
+        generate_file "${file}" "${duration}" "${waveform}" "${frequencies}"
+    done
+done < <(tail -n +2 $1) #Read CSV without header
