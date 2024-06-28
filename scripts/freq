@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#Frequency calculation: f2 = f1 * 2c/1200
+
+printf "%.4f\n" $(bc -l <<< "${1} * e(${2}/1200*l(2))")
