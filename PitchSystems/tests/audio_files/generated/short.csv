@@ -1,0 +1,5 @@
+filename,duration,waveform,root_freq,intervals,target_frequencies
+majorArpeggio-12ET-sin-A4.wav,2,sin,A4,0 400 700 1200,440.0000 554.3653 659.2551 880.0000 
+majorArpeggio-12ET-sin-A5.wav,2,sin,A5,0 400 700 1200,880.0000 1108.7305 1318.5102 1760.0000 
+MajorArpeggio-just12limit-sin-A4.wav,2,sin,A4,0 386.31 702 1200,440.0000 549.9988 660.0172 880.0000 
+MajorArpeggio-just12limit-sin-A5.wav,2,sin,A5,0 386.31 702 1200,880.0000 1099.9976 1320.0343 1760.0000 
