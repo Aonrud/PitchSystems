@@ -1,0 +1,6 @@
+filename,duration,waveform,root_freq,intervals,target_frequencies
+H2N-Guitar_spanish-majorArpeggio-A2.wav,,Guitar_Spanish,A2,0 400 700 1200,110 138.5914 164.8138 220 
+H2N-Voice-majorArpeggio-A2.wav,,Voice,A2,0 400 700 1200,110 138.5914 164.8138 220 
+H2N-Guitar_spanish_singleNote_E2.wav,,Guitar_Spanish,E2,0,82.4069
+H2N-Guitar_acoustic-melody-C3.wav,,Guitar_Acoustic,C3,0 700 400 0 200 400 0,130.8128 195.9977 164.8138130.8128 130.8128  164.8138 130.8128
+VH2N-Voice-melody-C3.wav,,Voice,C3,0 700 400 0 200 400 0,130.8128 195.9977 164.8138130.8128 130.8128  164.8138 130.8128
