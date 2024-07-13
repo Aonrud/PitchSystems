@@ -1,8 +1,8 @@
-from rest_framework import generics
+from rest_framework import viewsets
 from pitches.models import *
 from .serializers import *
 
 
-class IntervalAPIView(generics.ListAPIView):
+class IntervalView(viewsets.ModelViewSet): 
     queryset = Interval.objects.all()
     serializer_class = IntervalSerializer

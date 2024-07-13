@@ -27,6 +27,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Settings for REST Framework extension
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# Settings for OpenAPI documentation generation
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Pitch Systems",
+    "DESCRIPTION": "An API for accessing information about musical intervals, scales and pitches.",
+    "VERSION": "1.0.0",
+}
 
 # Application definition
 
@@ -40,6 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "pitches.apps.PitchesConfig",
     "api.apps.ApiConfig",
+    "drf_spectacular"
 ]
 
 MIDDLEWARE = [

@@ -12,4 +12,4 @@ class IntervalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Interval
-        fields = ("name", "description", "cents", "ratio")
+        fields = ("id", "name", "description", "cents", "ratio")

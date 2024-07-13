@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import IntervalAPIView
+from rest_framework.routers import SimpleRouter
+from .views import *
 
-urlpatterns = [
-    path("", IntervalAPIView.as_view(), name="interval_list"),
-]
+router = SimpleRouter()
+router.register("interval", IntervalView, basename="interval")
+
+urlpatterns = router.urls
