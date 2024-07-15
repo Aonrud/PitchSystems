@@ -1,8 +1,11 @@
 from django.urls import path
-from rest_framework.routers import SimpleRouter
+from rest_framework.routers import Route, DynamicRoute, SimpleRouter
 from .views import *
+from drf_spectacular.views import ( SpectacularAPIView, SpectacularSwaggerView )
 
-router = SimpleRouter()
-router.register("interval", IntervalView, basename="interval")
 
-urlpatterns = router.urls
+urlpatterns = [ 
+    path("interval/<int:pk>/", IntervalSingle.as_view(), name="interval_single"),
+    path("intervals/", IntervalList.as_view(), name="interval_list"),
+    path("intervals/<frequencies>/", IntervalFrequencies.as_view(), name="interval_frequencies")
+]

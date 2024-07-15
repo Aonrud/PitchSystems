@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "pitches.apps.PitchesConfig",
     "api.apps.ApiConfig",
-    "drf_spectacular"
+    "drf_spectacular",
+    "utils",
 ]
 
 MIDDLEWARE = [
