@@ -42,6 +42,11 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
 }
 
+# Custom settings for default values
+PS_SETTINGS = {
+    "CENTS_TOLERANCE": 3,
+}
+
 # Application definition
 
 INSTALLED_APPS = [

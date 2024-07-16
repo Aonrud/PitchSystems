@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from pitches.models import *
 from .serializers import *
 from utils import conversions
+from django.conf import settings
 
 
 class IntervalList(generics.ListAPIView):
@@ -18,7 +19,7 @@ class IntervalSingle(generics.RetrieveAPIView):
     # lookup_field = 'cents'
 
 
-class IntervalFrequencies(APIView):
+class FrequenciesView(APIView):
     http_method_names = ["get"]
 
     def validate_freqs(freqs: str) -> bool:
@@ -29,19 +30,27 @@ class IntervalFrequencies(APIView):
 
     def get(self, request, *args, **kwargs) -> Response:
         """
-        Return intervals matching frequencies given in kwargs
+        Return all information about a given set of frequencies
         """
-        tolerance = 5
-        frequencies = sorted(
-            set(self.kwargs["frequencies"].split(","))
-        )  # Order list of unique frequencies
+        tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
+        frequencies = self.kwargs["frequencies"].split(",")
+        scale = sorted(set(frequencies))  # Ordered list of unique frequencies
         inputs = []
-        output = {}
+        output = {
+            "request": { 
+                "frequencies": frequencies,
+                "scale": scale
+             },
+             "response": {
+                "intervals": {},
+                "scales": {}
+             }
+        }
 
-        root = frequencies[0]
+        root = scale[0]
 
         # Get interval from first
-        for freq in frequencies[1:]:
+        for freq in scale[1:]:
             inputs.append(conversions.cents_between(float(root), float(freq)))
 
         for input in inputs:
@@ -50,6 +59,6 @@ class IntervalFrequencies(APIView):
             )
             serializer = IntervalSerializer(intervals, many=True)
 
-            output["{:.4f}".format(input)] = serializer.data
+            output["response"]["intervals"]["{:.4f}".format(input)] = serializer.data
 
         return Response(output)
