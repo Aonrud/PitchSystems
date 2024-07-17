@@ -3,6 +3,9 @@
 .directory
 .kate-swp
 
+# Private values
+.env
+
 #Local reference files
 misc_files/
 

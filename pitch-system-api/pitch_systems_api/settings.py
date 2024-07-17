@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+# Import env vars
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,11 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-f-@jt5m8t1%ln29smiu!37vzc-zzxnzy331m=7-f$p0i!kh-p$"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -100,9 +104,11 @@ WSGI_APPLICATION = "pitch_systems_api.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "PS_api",
-        "USER": "django",
+        "NAME": os.environ.get("MARIADB_NAME"),
+        "USER": os.environ.get("MARIADB_USER"),
+        # "PASSWORD": os.environ.get("MARIADB_PASSWORD"),
         "PASSWORD": "bzMH4aA4u9x7V7bYnNJ4aWUy4WZkvb",
+        "HOST": os.environ.get("MARIADB_HOST"),
     }
 }
 
