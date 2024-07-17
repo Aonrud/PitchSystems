@@ -1,0 +1,32 @@
+services:
+  site:
+    build: .
+    container_name: "pitch-systems-api"
+    networks:
+      - db
+    ports:
+      - 127.0.0.1:${PORT}:8000
+    environment:
+      DEBUG: ${DEBUG}
+      MARIADB_HOST: "db"
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_NAME}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    restart: unless-stopped
+  db:
+    image: mariadb:10
+    networks:
+      - db
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_NAME}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    restart: unless-stopped
+volumes:
+  db:
+networks:
+  db:
