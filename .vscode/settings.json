@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "pitch-system-api"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
