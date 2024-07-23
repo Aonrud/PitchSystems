@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "pitches.scale", "fields": {"name": "Scale for testing value matching", "intervals": [597, 6, 600, 603, 606, 610, 2], "description": "Scale for testing value matching"}}, {"pk": 2, "model": "pitches.scale", "fields": {"name": "12-ET Major Scale", "intervals": [597, 599, 600, 603, 606, 610, 2], "description": "12-ET Major Scale"}}]

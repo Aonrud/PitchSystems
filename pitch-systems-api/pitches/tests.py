@@ -10,7 +10,7 @@ class IntervalTests(TestCase):
             name="Perfect Fifth",
             description="A just-intonation perfect fifth",
             cents=702,
-            ratio_enumerator=3,
+            ratio_numerator=3,
             ratio_denominator=2
         )
 
@@ -18,5 +18,5 @@ class IntervalTests(TestCase):
         self.assertEqual(self.interval.name, "Perfect Fifth")
         self.assertEqual(self.interval.description, "A just-intonation perfect fifth")
         self.assertEqual(self.interval.cents, 702)
-        self.assertEqual(self.interval.ratio_enumerator, 3)
+        self.assertEqual(self.interval.ratio_numerator, 3)
         self.assertEqual(self.interval.ratio_denominator, 2)

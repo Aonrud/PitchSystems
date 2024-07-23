@@ -12,7 +12,7 @@ class APITests(APITestCase):
             name="Perfect Fifth",
             description="A just-intonation perfect fifth",
             cents=Decimal(str(702)),
-            ratio_enumerator=3,
+            ratio_numerator=3,
             ratio_denominator=2
         )
 
@@ -20,6 +20,4 @@ class APITests(APITestCase):
         response = self.client.get(reverse("interval_list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Interval.objects.count(), 1)
-        # print(response.content)
-        # print(self.interval)
         self.assertContains(response, self.interval)
