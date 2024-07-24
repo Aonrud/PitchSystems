@@ -33,7 +33,7 @@ class ScaleListView(generics.ListAPIView):
 class FrequenciesView(APIView):
     http_method_names = ["get"]
 
-    def validate_freqs(freqs: str) -> bool:
+    def validate_freqs(self, freqs: str) -> bool:
         """
         Validate a comma-separated list of frequencies
         """
@@ -71,7 +71,7 @@ class FrequenciesView(APIView):
             intervals = Interval.objects.filter(cents__gte=input - tolerance).filter(
                 cents__lte=input + tolerance
             )
-            serializer = IntervalSerializer(intervals, many=True)
+            int_serializer = IntervalSerializer(intervals, many=True)
 
             closest = min(
                 intervals,
@@ -81,12 +81,12 @@ class FrequenciesView(APIView):
 
             output["response"]["intervals"]["{:.4f}".format(input)] = {
                 "closest": closest.id,
-                "matches": serializer.data,
+                "matches": int_serializer.data,
             }
 
-        # Get matching scales
+        # Get matching scal es
         scales = Scale.objects.filter(intervals__in=scale_interval_matches)
-        serializer = ScaleSerializer(scales, many=True)
-        output["response"]["scales"] = serializer.data
+        scale_serializer = ScaleSerializer(scales, many=True)
+        output["response"]["scales"] = scale_serializer.data
 
         return Response(output)
