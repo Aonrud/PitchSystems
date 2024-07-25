@@ -49,6 +49,7 @@ SPECTACULAR_SETTINGS = {
 # Custom settings for default values
 PS_SETTINGS = {
     "CENTS_TOLERANCE": 3,
+    "LIST_STRING_SEPARATOR": ",", # Note: '+' will be parsed as a space in queries, but not url slugs
 }
 
 # Application definition
@@ -106,8 +107,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.environ.get("MARIADB_NAME"),
         "USER": os.environ.get("MARIADB_USER"),
-        # "PASSWORD": os.environ.get("MARIADB_PASSWORD"),
-        "PASSWORD": "bzMH4aA4u9x7V7bYnNJ4aWUy4WZkvb",
+        "PASSWORD": os.environ.get("MARIADB_PASSWORD"),
         "HOST": os.environ.get("MARIADB_HOST"),
     }
 }
