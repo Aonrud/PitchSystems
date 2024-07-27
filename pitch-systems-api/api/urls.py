@@ -3,16 +3,16 @@ from rest_framework.routers import Route, DynamicRoute, SimpleRouter
 from .views import *
 
 
-urlpatterns = [
+urlpatterns = [ 
     path(
         "frequencies/<str:frequencies>/",
-        FrequenciesView.as_view(),
+        FrequencyView.as_view(),
         name="interval_frequencies",
     ),
-    path("interval/<int:pk>/", IntervalSingleView.as_view(), name="interval_single"),
-    path("intervals/", IntervalListView.as_view(), name="interval_list"),
-    path("intervals/<str:frequencies>/", IntervalListView.as_view(), name="intervals_frequencies"),
-    path("scale/<int:pk>/", ScaleSingleView.as_view(), name="scale_single"),
-    path("scales/", ScaleListView.as_view(), name="scale_list"),
-    path("scales/<str:intervals>/", ScaleSingleView.as_view(), name="scale_intervals"),
+    path("interval/<int:pk>/", IntervalViewset.as_view({'get': 'retrieve'}), name="interval_single"),
+    path("intervals/", IntervalViewset.as_view({'get': 'list'}), name="interval_list"),
+    path("frequencies/<str:frequencies>/", FrequencyView.as_view(), name="frequency_cents"),
+    path("scale/<int:pk>/", ScaleViewset.as_view({'get': 'retrieve'}), name="scale_single"),
+    path("scales/", ScaleViewset.as_view({'get': 'list'}), name="scale_list"),
+    path("scales/<str:intervals>/", ScaleViewset.as_view({'get': 'list'}), name="scale_intervals"),
 ]

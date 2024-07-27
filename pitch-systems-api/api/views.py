@@ -1,36 +1,74 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets, views
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from pitches.models import *
 from .serializers import *
-from utils import conversions
+import utils
 from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class IntervalListView(generics.ListAPIView):
-    queryset = Interval.objects.all()
+class FrequencyView(views.APIView):
+    """
+    View to take a list of frequencies and return the list of intervals between the lowest frequency
+    and each of the others.
+    """
+
+    def get(self, request, **kwargs):
+        tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
+        frequencies = self.kwargs["frequencies"].split(settings.PS_SETTINGS["LIST_STRING_SEPARATOR"])
+
+        # Validate frequencies and raise exception
+        test = FrequencySerializer(data=[{"value": x} for x in frequencies], many=True)
+        test.is_valid(raise_exception=True)
+
+        scale = sorted(set(frequencies))  # Ordered list of unique frequencies
+        root = scale[0]
+        cents = {}
+        for freq in scale[1:]:
+            cents[f"{root}-{freq}"] = utils.format_cents(
+                utils.cents_between(float(root), float(freq))
+            )
+        return Response(cents)
+
+
+class IntervalViewset(viewsets.ReadOnlyModelViewSet):
     serializer_class = IntervalSerializer
 
+    def get_queryset(self):
+        queryset = Interval.objects.all()
 
-class IntervalSingleView(generics.RetrieveAPIView):
-    queryset = Interval.objects.all()
-    serializer_class = IntervalSerializer
+        filters = {}
+        for param in ["cents", "id"]:
+            value = self.request.query_params.get(param)
+            if value is not None:
+                filters[f"{param}__in"] = value.split(settings.PS_SETTINGS["LIST_STRING_SEPARATOR"])
+
+        # TODO: Add logic for ratio. Custom QuerySet or model method? See if it can be done in standard filter method
+
+        if filters:
+            queryset = Interval.objects.filter(**filters)
+        return queryset
 
 
-class ScaleSingleView(generics.RetrieveAPIView):
-    queryset = Scale.objects.all()
+class ScaleViewset(viewsets.ReadOnlyModelViewSet):
+    """
+    Get Scales by ID, filtered by intervals included, or the full list.
+    """
     serializer_class = ScaleSerializer
 
+    def get_queryset(self):
+        queryset = Scale.objects.all()
+        intervals = self.kwargs.get("intervals")
+        if intervals is not None:
+            intervals = intervals.split(settings.PS_SETTINGS["LIST_STRING_SEPARATOR"])
+            intersections = [Scale.objects.filter(intervals = interval) for interval in intervals[1:]] 
+            queryset = Scale.objects.filter(intervals = intervals[0]).intersection(*intersections)
+        return queryset 
 
-class ScaleListView(generics.ListAPIView):
-    queryset = Scale.objects.all()
-    serializer_class = ScaleSerializer
 
-
-class FrequenciesView(APIView):
+class FrequenciesView(views.APIView):
     http_method_names = ["get"]
 
     def validate_freqs(self, freqs: str) -> bool:
@@ -44,7 +82,7 @@ class FrequenciesView(APIView):
         Return all information about a given set of frequencies
         """
         tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
-        frequencies = self.kwargs["frequencies"].split("+")
+        frequencies = self.kwargs["frequencies"].split(settings.PS_SETTINGS["LIST_STRING_SEPARATOR"])
 
         # Validate frequencies and raise exception
         test = FrequencySerializer(data=[{"value": x} for x in frequencies], many=True)
@@ -65,7 +103,7 @@ class FrequenciesView(APIView):
 
         # Get interval from first
         for freq in scale[1:]:
-            inputs.append(conversions.cents_between(float(root), float(freq)))
+            inputs.append(utils.cents_between(float(root), float(freq)))
 
         for input in inputs:
             intervals = Interval.objects.filter(cents__gte=input - tolerance).filter(
@@ -79,7 +117,7 @@ class FrequenciesView(APIView):
             )
             scale_interval_matches.append(closest.id)
 
-            output["response"]["intervals"]["{:.4f}".format(input)] = {
+            output["response"]["intervals"][utils.format_cents(input)] = {
                 "closest": closest.id,
                 "matches": int_serializer.data,
             }
