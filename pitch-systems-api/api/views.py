@@ -9,11 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FrequencyView(views.APIView):
+class FrequencyView(generics.GenericAPIView):
     """
     View to take a list of frequencies and return the list of intervals between the lowest frequency
     and each of the others.
     """
+    serializer_class = FrequencySerializer
 
     def get(self, request, **kwargs):
         tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
