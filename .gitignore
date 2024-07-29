@@ -13,6 +13,7 @@ misc_files/
 #Python
 __pycache__/
 .venv/
+.coverage
 
 #Django
 staticfiles/

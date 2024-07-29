@@ -1,0 +1,26 @@
+[
+    {
+        "model": "pitches.system",
+        "pk": 1,
+        "fields": {
+            "name": "12 Tone Equal Temperament",
+            "description": "Divides an octave into twelve semitones of equal size."
+        }
+    },
+    {
+        "model": "pitches.system",
+        "pk": 2,
+        "fields": {
+            "name": "5-Limit Just Temperament",
+            "description": "A Just Temperament which limits the calculation of intervals to combining intervals of 2:1, 3:2, 5:4, i.e. 'just' or harmonic octaves, fifths and major thirds, respectively."
+        }
+    },
+    {
+        "model": "pitches.system",
+        "pk": 3,
+        "fields": {
+            "name": "Pythagorean Tuning",
+            "description": "Pythagorean tuning caculates intervals by prioritising the interval of the fifth, or 3:2."
+        }
+    }
+]

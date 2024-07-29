@@ -17,10 +17,10 @@ test_intervals = [
     ),
 ]
 
-test_scales = [
-    Scale.objects.create(
-        name="12-ET Major",
-        description="The major scale in 12-tone equal temperament",
+test_systems = [
+    System.objects.create(
+        name="12-Tone Equal Temperament",
+        description="Divides the octave into 12 equal semitones of 100 cents.",
     )
 ]
 
@@ -28,7 +28,16 @@ test_scales = [
 class IntervalTest(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.system = test_systems[0]
+        cls.system.save()
         cls.interval = test_intervals[0]
+        cls.interval.save()
+        cls.interval_name = IntervalName.objects.create(
+            name="Alternative Name",
+            description=None,
+            interval=cls.interval,
+            system=cls.system,
+        )
 
     def test_interval_fields_valid(self):
         self.assertEqual(self.interval.name, "Rational Interval")
@@ -37,19 +46,43 @@ class IntervalTest(TestCase):
         self.assertEqual(self.interval.ratio_numerator, 3)
         self.assertEqual(self.interval.ratio_denominator, 2)
 
+    def test_interval_name_fields_valid(self):
+        self.assertEqual(self.interval_name.name, "Alternative Name")
+        self.assertIsNone(self.interval_name.description)
+
 
 class ScaleTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.scale = test_scales[0]
-        cls.intervals = test_intervals  
-        cls.scale.intervals.add(cls.intervals[0])
-        cls.scale.intervals.add(cls.intervals[1])
+        cls.intervals = test_intervals
+        for interval in cls.intervals:
+            interval.save()
+
+        cls.system = test_systems[0]
+        cls.system.save()
+        cls.scale = Scale.objects.create(
+            name="12-ET Major",
+            description="The major scale in 12-tone equal temperament",
+            system=cls.system,
+        )
+        cls.scale.intervals.set(cls.intervals)
 
     def test_scale_fields_valid(self):
         self.assertEqual(self.scale.name, "12-ET Major")
         self.assertEqual(
             self.scale.description, "The major scale in 12-tone equal temperament"
         )
-        self.assertListEqual([str(interval) for interval in self.scale.intervals.all()], ["Rational Interval", "Cents interval"])
-        # self.assertEqual(list(self.scale.intervals.all()), self.intervals)
+        self.assertEqual(self.scale.system, self.system)
+        self.assertListEqual(list(self.scale.intervals.all()), self.intervals)
+
+
+class NomenclatureTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.nomenclature = Nomenclature.objects.create(
+            name="Term", description="Definition"
+        )
+
+    def test_nomenclature_fields_valid(self):
+        self.assertEqual(self.nomenclature.name, "Term")
+        self.assertEqual(self.nomenclature.description, "Definition")

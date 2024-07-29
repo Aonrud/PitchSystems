@@ -42,7 +42,7 @@ class Interval(AbstractBaseModel):
     ordering = ["cents"]
 
     def __str__(self):
-        return self.cents
+        return str(self.cents)
 
 
 class IntervalName(AbstractBaseModel):

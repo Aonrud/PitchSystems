@@ -1,0 +1,42 @@
+[
+    {
+        "model": "pitches.intervalname",
+        "pk": 1,
+        "fields": {
+            "name": "Major Second",
+            "description": null,
+            "interval": 7,
+            "system": null
+        }
+    },
+    {
+        "model": "pitches.intervalname",
+        "pk": 2,
+        "fields": {
+            "name": "Augmented Fourth",
+            "description": null,
+            "interval": 18,
+            "system": 1
+        }
+    },
+    {
+        "model": "pitches.intervalname",
+        "pk": 3,
+        "fields": {
+            "name": "Diminished Fifth",
+            "description": null,
+            "interval": 18,
+            "system": 1
+        }
+    },
+    {
+        "model": "pitches.intervalname",
+        "pk": 4,
+        "fields": {
+            "name": "Augmented Fifth",
+            "description": null,
+            "interval": 4,
+            "system": 1
+        }
+    }
+]

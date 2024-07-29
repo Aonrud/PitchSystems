@@ -14,4 +14,4 @@ def cents_above(freq: float, cents: float) -> float:
     Return the frequency in Hertz that is the given
     number of cents above the given frequency.
     """
-    return freq * (cents * 2) / 1200
+    return freq * (2 ** (cents / 1200))

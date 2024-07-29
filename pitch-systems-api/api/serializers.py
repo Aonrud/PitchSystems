@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from pitches.models import *
-
+from drf_spectacular.utils import extend_schema, OpenApiParameter   
 
 class IntervalNameSerializer(serializers.ModelSerializer):
     # system = serializers.StringRelatedField()
@@ -15,7 +15,7 @@ class IntervalSerializer(serializers.ModelSerializer):
     Serializes an interval with full information.
     """
 
-    ratio = serializers.SerializerMethodField()
+    ratio: str = serializers.SerializerMethodField()
     additional_names = IntervalNameSerializer(many=True, read_only=True)
 
     # TODO: If set, the name associated with this system will be displayed instead of the default
@@ -27,9 +27,7 @@ class IntervalSerializer(serializers.ModelSerializer):
     # if system_id:
     #     name = [o for o in additional_names.data if o.system == system_id][0]
 
-    
-
-    def get_ratio(self, obj):
+    def get_ratio(self, obj) -> str:
         if obj.ratio_numerator is None:
             return None
         else:
@@ -42,7 +40,7 @@ class IntervalSerializer(serializers.ModelSerializer):
 
 class ScaleSerializer(serializers.ModelSerializer):
     intervals = IntervalSerializer(many=True, read_only=True)
-    system = serializers.StringRelatedField()
+    # system = serializers.StringRelatedField()
 
     class Meta:
         model = Scale

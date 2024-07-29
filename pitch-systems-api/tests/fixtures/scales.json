@@ -1,0 +1,164 @@
+[
+    {
+        "pk": 1,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Pythagorean Harmonic Minor Scale",
+            "intervals": [
+                7,
+                8,
+                15,
+                22,
+                23,
+                34,
+                35
+            ],
+            "description": "Pythagorean Harmonic Minor Scale",
+            "system": 3
+        }
+    },
+    {
+        "pk": 2,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Just Harmonic Minor Scale",
+            "intervals": [
+                7,
+                10,
+                15,
+                22,
+                25,
+                32,
+                35
+            ],
+            "description": "Just Harmonic Minor Scale",
+            "system": 2
+        }
+    },
+    {
+        "pk": 3,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Just Major Scale",
+            "intervals": [
+                7,
+                12,
+                15,
+                22,
+                26,
+                32,
+                35
+            ],
+            "description": "Just Major Scale",
+            "system": 2
+        }
+    },
+    {
+        "pk": 4,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Pythagroean Natural Minor Scale",
+            "intervals": [
+                7,
+                8,
+                15,
+                22,
+                23,
+                29,
+                35
+            ],
+            "description": "Pythagroean Natural Minor Scale",
+            "system": 3
+        }
+    },
+    {
+        "pk": 5,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Just Natural Minor Scale",
+            "intervals": [
+                7,
+                10,
+                15,
+                22,
+                25,
+                31,
+                35
+            ],
+            "description": "Just Natural Minor Scale",
+            "system": 2
+        }
+    },
+    {
+        "pk": 6,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "Pythagorean Major Scale",
+            "intervals": [
+                7,
+                14,
+                15,
+                22,
+                28,
+                34,
+                35
+            ],
+            "description": "Pythagorean Major Scale",
+            "system": 3
+        }
+    },
+    {
+        "pk": 7,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "12-ET Harmonic Minor Scale",
+            "intervals": [
+                3,
+                9,
+                16,
+                21,
+                24,
+                33,
+                35
+            ],
+            "description": "12-ET Harmonic Minor Scale",
+            "system": 1
+        }
+    },
+    {
+        "pk": 8,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "12-ET Major Scale",
+            "intervals": [
+                3,
+                13,
+                16,
+                21,
+                27,
+                33,
+                35
+            ],
+            "description": "12-ET Major Scale",
+            "system": 1
+        }
+    },
+    {
+        "pk": 9,
+        "model": "pitches.scale",
+        "fields": {
+            "name": "12-ET Natural Minor Scale",
+            "intervals": [
+                3,
+                9,
+                16,
+                21,
+                24,
+                30,
+                35
+            ],
+            "description": "12-ET Natural Minor Scale",
+            "system": 1
+        }
+    }
+]

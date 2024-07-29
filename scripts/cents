@@ -4,4 +4,4 @@
 #bc uses ln, so divide by l(2) to get binary log
 
 #Output cents difference between P1 and P2
-printf "%.2f\n" $(bc -l <<< "l(${2}/${1})/l(2) * 1200")
+printf "%.4f\n" $(bc -l <<< "l(${2}/${1})/l(2) * 1200")

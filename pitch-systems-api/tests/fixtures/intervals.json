@@ -1,0 +1,387 @@
+[
+    {
+        "model": "pitches.interval",
+        "pk": 1,
+        "fields": {
+            "name": "Unison",
+            "description": null,
+            "cents": 0,
+            "ratio_numerator": 1,
+            "ratio_denominator": 1
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 2,
+        "fields": {
+            "name": "Pythagorean Minor Second",
+            "description": null,
+            "cents": 90.225,
+            "ratio_numerator": 256,
+            "ratio_denominator": 243
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 3,
+        "fields": {
+            "name": "12-ET Minor Second",
+            "description": null,
+            "cents": 100,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 4,
+        "fields": {
+            "name": "Just Minor Second",
+            "description": null,
+            "cents": 111.7313,
+            "ratio_numerator": 16,
+            "ratio_denominator": 15
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 5,
+        "fields": {
+            "name": "Minor Tone",
+            "description": null,
+            "cents": 182.4037,
+            "ratio_numerator": 10,
+            "ratio_denominator": 9
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 6,
+        "fields": {
+            "name": "12-ET Major Second",
+            "description": null,
+            "cents": 200,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 7,
+        "fields": {
+            "name": "Major Tone",
+            "description": null,
+            "cents": 203.91,
+            "ratio_numerator": 9,
+            "ratio_denominator": 8
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 8,
+        "fields": {
+            "name": "Pythagorean Minor Third",
+            "description": null,
+            "cents": 294.135,
+            "ratio_numerator": 32,
+            "ratio_denominator": 27
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 9,
+        "fields": {
+            "name": "12-ET Minor Third",
+            "description": null,
+            "cents": 300,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 10,
+        "fields": {
+            "name": "Just Minor Third",
+            "description": null,
+            "cents": 315.6413,
+            "ratio_numerator": 6,
+            "ratio_denominator": 5
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 11,
+        "fields": {
+            "name": "Pythagorean Diminished Fifth",
+            "description": null,
+            "cents": 365.7261,
+            "ratio_numerator": 1024,
+            "ratio_denominator": 829
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 12,
+        "fields": {
+            "name": "Just Major Third",
+            "description": null,
+            "cents": 386.3137,
+            "ratio_numerator": 5,
+            "ratio_denominator": 4
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 13,
+        "fields": {
+            "name": "12-ET Major Third",
+            "description": null,
+            "cents": 400,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 14,
+        "fields": {
+            "name": "Pythagorean Major Third",
+            "description": null,
+            "cents": 407.82,
+            "ratio_numerator": 81,
+            "ratio_denominator": 64
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 15,
+        "fields": {
+            "name": "Perfect Fourth",
+            "description": null,
+            "cents": 498.045,
+            "ratio_numerator": 4,
+            "ratio_denominator": 3
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 16,
+        "fields": {
+            "name": "12-ET Fourth",
+            "description": null,
+            "cents": 500,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 17,
+        "fields": {
+            "name": "Just Augmented Fourth",
+            "description": null,
+            "cents": 590.2237,
+            "ratio_numerator": 45,
+            "ratio_denominator": 32
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 18,
+        "fields": {
+            "name": "12-ET Tritone",
+            "description": null,
+            "cents": 600,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 19,
+        "fields": {
+            "name": "Just Diminished Fifth",
+            "description": null,
+            "cents": 609.7763,
+            "ratio_numerator": 64,
+            "ratio_denominator": 45
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 20,
+        "fields": {
+            "name": "Pythagorean Augmented Fourth",
+            "description": null,
+            "cents": 611.73,
+            "ratio_numerator": 729,
+            "ratio_denominator": 512
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 21,
+        "fields": {
+            "name": "12-ET Fifth",
+            "description": null,
+            "cents": 700,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 22,
+        "fields": {
+            "name": "Perfect Fifth",
+            "description": null,
+            "cents": 701.955,
+            "ratio_numerator": 3,
+            "ratio_denominator": 2
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 23,
+        "fields": {
+            "name": "Pythagorean Minor Sixth",
+            "description": null,
+            "cents": 792.18,
+            "ratio_numerator": 128,
+            "ratio_denominator": 81
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 24,
+        "fields": {
+            "name": "12-ET Minor Sixth",
+            "description": null,
+            "cents": 800,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 25,
+        "fields": {
+            "name": "Just Minor Sixth",
+            "description": null,
+            "cents": 813.6863,
+            "ratio_numerator": 8,
+            "ratio_denominator": 5
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 26,
+        "fields": {
+            "name": "Just Major Sixth",
+            "description": null,
+            "cents": 884.3587,
+            "ratio_numerator": 5,
+            "ratio_denominator": 3
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 27,
+        "fields": {
+            "name": "12-ET Major Sixth",
+            "description": null,
+            "cents": 900,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 28,
+        "fields": {
+            "name": "Pythagorean Major Sixth",
+            "description": null,
+            "cents": 905.865,
+            "ratio_numerator": 27,
+            "ratio_denominator": 16
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 29,
+        "fields": {
+            "name": "Pythagorean Minor Seventh",
+            "description": null,
+            "cents": 996.09,
+            "ratio_numerator": 16,
+            "ratio_denominator": 9
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 30,
+        "fields": {
+            "name": "12-ET Minor Seventh",
+            "description": null,
+            "cents": 1000,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 31,
+        "fields": {
+            "name": "Just Minor Seventh",
+            "description": null,
+            "cents": 1017.5963,
+            "ratio_numerator": 9,
+            "ratio_denominator": 5
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 32,
+        "fields": {
+            "name": "Just Major Seventh",
+            "description": null,
+            "cents": 1088.2687,
+            "ratio_numerator": 15,
+            "ratio_denominator": 8
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 33,
+        "fields": {
+            "name": "12-ET Major Seventh",
+            "description": null,
+            "cents": 1100,
+            "ratio_numerator": null,
+            "ratio_denominator": null
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 34,
+        "fields": {
+            "name": "Pythagorean Major Seventh",
+            "description": null,
+            "cents": 1109.775,
+            "ratio_numerator": 243,
+            "ratio_denominator": 128
+        }
+    },
+    {
+        "model": "pitches.interval",
+        "pk": 35,
+        "fields": {
+            "name": "Octave",
+            "description": null,
+            "cents": 1200,
+            "ratio_numerator": 2,
+            "ratio_denominator": 1
+        }
+    }
+]
