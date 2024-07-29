@@ -23,7 +23,7 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /opt/app
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry install
+RUN poetry install --without dev
 
 COPY . .
 
