@@ -75,9 +75,9 @@ class AudioParser:
         This is quite a crude approach, but is useful where a good onset algorithm is absent.
         Proper onset should account for attack, confidence and pitch change together.
         """
-        groups = [[]]
-        durations = []
-        group_index = 0
+        groups: list[list] = [[]]
+        durations: list[int] = []
+        group_index: int = 0
 
         # Group freqs. into lists where they are +- cents_tolerance cents apart
         for i in range(len(freqs)):
