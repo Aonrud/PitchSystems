@@ -3,7 +3,7 @@ import librosa_pyin as freq_reader
 # import pd as freq_reader
 import csv
 import numpy as np
-from PitchSystems import cents
+import audio_parser.cents as cents
 import statistics
 from pprint import pprint
 

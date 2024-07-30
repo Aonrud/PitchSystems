@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Aonrud <aonrud@fastmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.10.14"
@@ -13,7 +14,15 @@ matplotlib = "^3.9.0"
 librosa = "^0.10.2.post1"
 pitch-detectors = "^0.5.2"
 pydantic = "<2"
+flask = "^3.0.3"
+validators = "^0.33.0"
+requests = "^2.32.3"
+requests-cache = "^1.2.1"
 
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11.0"
+types-requests = "^2.32.0.20240712"
 
 [build-system]
 requires = ["poetry-core"]
