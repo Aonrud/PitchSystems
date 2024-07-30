@@ -1,7 +1,7 @@
 {
-    "python.testing.pytestArgs": [
-        "pitch-system-api"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "files.exclude": {
+        "pitch-systems-api": true,
+        "pitch-systems-frontend": true,
+        "audio-parser": true
+    }
 }

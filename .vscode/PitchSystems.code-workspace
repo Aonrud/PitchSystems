@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../pitch-systems-api"
+		},
+		{
+			"path": "../audio-parser"
+		},
+		{
+			"path": "../pitch-systems-frontend"
+		},
+		{
+			"path": "../"
+		}
+	],
+	"settings": {}
+}
