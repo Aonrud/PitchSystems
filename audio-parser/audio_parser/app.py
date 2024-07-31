@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request
 from urllib.parse import quote_plus, unquote_plus
-from parser import *
+from .parser import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -27,4 +31,4 @@ def api():
     return jsonify(parser.parse())
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', threaded=True, debug=True )
+    app.run(host="127.0.0.1", threaded=True, debug=True ) # Dev use only

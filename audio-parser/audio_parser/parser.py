@@ -3,7 +3,7 @@ import requests
 from requests_cache import CachedSession, FileCache
 from io import BytesIO
 import librosa
-import cents
+from .cents import *
 import statistics
 import numpy
 
@@ -64,7 +64,7 @@ class AudioParser:
         intervals = [ 0.0 ] # First note is unison with itself
         for i in range(len(freqs_filtered)):
             if i > 0:
-                intervals.append(cents.interval(freqs_filtered[0], freqs_filtered[i]))
+                intervals.append(interval(freqs_filtered[0], freqs_filtered[i]))
 
         return {"freqs": freqs_filtered, "intervals": intervals}
 
@@ -82,7 +82,7 @@ class AudioParser:
         # Group freqs. into lists where they are +- cents_tolerance cents apart
         for i in range(len(freqs)):
             if i > 0:
-                diff = cents.interval(freqs[i - 1], freqs[i])
+                diff = interval(freqs[i - 1], freqs[i])
                 if abs(diff) > cents_tolerance:
                     group_index += 1
                     groups.append([])
