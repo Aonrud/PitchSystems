@@ -3,7 +3,7 @@ import requests
 from requests_cache import CachedSession, FileCache
 from io import BytesIO
 import librosa
-from .cents import *
+from cents import *
 import statistics
 import numpy
 
@@ -48,27 +48,36 @@ class AudioUrlHandler:
 
 class AudioParser:
 
-    def __init__(self, data: BytesIO) -> None:
+    def __init__(self, data: BytesIO, settings: dict) -> None:
+        """
+
+        """
         self.data = data
+        self.cents_tolerance = settings["cents_tolerance"]
+        self.sample_significance = settings["sample_significance"]
+        self.min = settings["freq_min"]
+        self.max = settings["freq_max"]
 
     def parse(self) -> dict:
         y, sr = librosa.load(self.data)
-        f0, voiced_flag, voiced_probs = librosa.pyin(y, sr=sr, fmin=50, fmax=2000)
+        f0, voiced_flag, voiced_probs = librosa.pyin(y, sr=sr, fmin=self.min, fmax=self.max)
 
         f0 = f0[~numpy.isnan(f0)]
         freqs, durations = self.collate(f0.tolist())
 
-        # Try accepting only freqs detected for 10 or more samples
-        freqs_filtered = [freq for (freq, duration) in zip(freqs, durations) if duration > 10]
+        # Try accepting only freqs detected for x or more samples
+        freqs_filtered = [
+            freq for (freq, duration) in zip(freqs, durations) if duration > self.sample_significance
+        ]
 
-        intervals = [ 0.0 ] # First note is unison with itself
+        intervals = [0.0]  # First note is unison with itself
         for i in range(len(freqs_filtered)):
             if i > 0:
                 intervals.append(interval(freqs_filtered[0], freqs_filtered[i]))
 
         return {"freqs": freqs_filtered, "intervals": intervals}
 
-    def collate(self, freqs: list, cents_tolerance: int = 20) -> list:
+    def collate(self, freqs: list) -> list:
         """
         Collate frequencies into note groups based on frequency proximity.
 
@@ -83,7 +92,7 @@ class AudioParser:
         for i in range(len(freqs)):
             if i > 0:
                 diff = interval(freqs[i - 1], freqs[i])
-                if abs(diff) > cents_tolerance:
+                if abs(diff) > self.cents_tolerance:
                     group_index += 1
                     groups.append([])
                 groups[group_index].append(freqs[i])

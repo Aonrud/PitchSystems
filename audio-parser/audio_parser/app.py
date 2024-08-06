@@ -1,10 +1,19 @@
 from flask import Flask, jsonify, request
 from urllib.parse import quote_plus, unquote_plus
-from .parser import *
+from parser import *
 import os
 from dotenv import load_dotenv
+import yaml
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
+
+# Load configuration
+conf_file = open(BASE_DIR / 'config.yaml', 'r')
+config = yaml.safe_load(conf_file)
+print(config)
 
 app = Flask(__name__)
 
@@ -27,7 +36,7 @@ def api():
     except ValueError:
         return "Invalid audio URL", 400
 
-    parser = AudioParser(audio.get())
+    parser = AudioParser(audio.get(), config)
     return jsonify(parser.parse())
 
 if __name__ == '__main__':
