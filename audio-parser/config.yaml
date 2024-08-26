@@ -1,4 +1,4 @@
 cents_tolerance: 10
 sample_significance: 5
 freq_min: 50
-freq_max: 20000
+freq_max: 10000

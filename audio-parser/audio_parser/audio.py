@@ -10,8 +10,11 @@ import asyncio
 import websockets
 from pathlib import Path
 import json
+from urllib.request import urlopen
+import soundfile
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 class AudioUrlHandler:
     """
@@ -44,47 +47,43 @@ class AudioUrlHandler:
         if not mime.partition("/")[0] == "audio":
             raise ValueError("URL is not an audio file")
 
-    def get(self) -> BytesIO:
+    def get(self) -> soundfile.SoundFile:
         # Could become invalid between instantiation and fetch
         self.validate_url(self.url)
         response = self.session.get(self.url)
-        return BytesIO(response.content)
+        print(response.content)
+        f = BytesIO(response.content)
+        return soundfile.SoundFile(f)
 
 
 class AudioParser:
 
-    def __init__(self, data: BytesIO, settings: dict) -> None:
+    def __init__(self, settings: dict) -> None:
         """ """
-        self.data = data
         self.cents_tolerance = settings["cents_tolerance"]
         self.sample_significance = settings["sample_significance"]
         self.min = settings["freq_min"]
-        self.max = settings["freq_max"]
 
-    async def connect(self):
-        async with websockets.serve(self.stream, "localhost", 5678):
-            await asyncio.Future()  # run forever
-
-    async def stream(self, websocket):
+    async def stream(self, file, websocket):
         n_fft = 2048
         hop_length = 512
-        sr = librosa.get_samplerate(self.data)
+        sr = librosa.get_samplerate(file)
 
-        file = str(BASE_DIR / 'test.wav')
         stream = librosa.stream(
             file,
             block_length=16,
             frame_length=n_fft,
             hop_length=hop_length,
             mono=True,
-            fill_value=0,           
+            fill_value=0,
         )
         for y_block in stream:
-            f0, voiced_flag, voiced_probs = librosa.pyin(
+            result = librosa.pyin(
                 y_block, sr=sr, fmin=self.min, fmax=self.max
             )
-            await websocket.send(json.dumps(f0.tolist()))
-            # await asyncio.sleep(random.random() * 2 + 1)
+            message = json.dumps(result[0])
+            await websocket.send(message)
+
 
     def parse(self) -> dict:
         y, sr = librosa.load(self.data)
