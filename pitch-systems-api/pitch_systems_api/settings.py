@@ -53,6 +53,13 @@ PS_SETTINGS = {
     "LIST_STRING_SEPARATOR": ",", # Note: '+' will be parsed as a space in queries, but not url slugs
 }
 
+#Add CORS headers
+CORS_ALLOWED_ORIGINS = [
+    "https://pitch-systems.aonghus.org",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,9 +74,11 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "drf_spectacular",
     "utils",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
