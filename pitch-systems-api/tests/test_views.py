@@ -55,7 +55,19 @@ class FrequencyTests(APITestCase):
             reverse("frequency_cents", kwargs={"frequencies": self.freqs_valid})
         )
         expected = {
+            "327.0320-327.0320": "0.0000",
+            "327.0320-261.6256": "-386.3137",
+            "327.0320-392.4384": "315.6413",
+        }
+        self.assertEqual(response.data, expected)
+
+    def test_frequency_view_with_root_valid(self):
+        response = self.client.get(
+            reverse_querystring("frequency_cents", kwargs={"frequencies": self.freqs_valid}, query_kwargs={"root": "261.6256"})
+        )
+        expected = {
             "261.6256-327.0320": "386.3137",
+            "261.6256-261.6256": "0.0000",
             "261.6256-392.4384": "701.9550",
         }
         self.assertEqual(response.data, expected)
@@ -116,6 +128,19 @@ class IntervalTests(APITestCase):
             reverse_querystring("interval_list", query_kwargs={"cents": "abc,400"})
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_intervals_near(self):
+        response = self.client.get(
+            reverse_querystring(
+                "intervals_near",
+                kwargs={"cents": "700"},
+                query_kwargs={"tolerance": "3"},
+            )
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertContains(response, self.intervals[0])
+        self.assertContains(response, self.intervals[1])
 
 
 class ScaleTests(APITestCase):

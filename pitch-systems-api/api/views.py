@@ -26,7 +26,7 @@ class FrequencyView(views.APIView):
         )
 
         root = self.request.query_params.get("root")
-        if root and root.isnumeric():
+        if root:
             ref_freq = root
         else:
             ref_freq = frequencies[0]
@@ -84,14 +84,14 @@ class IntervalViewset(viewsets.ReadOnlyModelViewSet):
         req_tolerance = self.request.query_params.get("tolerance")
 
         # Set tolerance if valid, otherwise fallback to default
-        if req_tolerance and req_tolerance.isnumeric():
+        if req_tolerance:
             tolerance = req_tolerance
 
         if cents:
             queryset = Interval.objects.all()
             filters = {}
-            filters[f"cents__gte"] = cents - tolerance
-            filters[f"cents__lte"] = cents + tolerance
+            filters[f"cents__gte"] = int(cents) - int(tolerance)
+            filters[f"cents__lte"] = int(cents) + int(tolerance)
             queryset = Interval.objects.filter(**filters)
 
             result = self.serializer_class(queryset, many=True)
