@@ -11,8 +11,9 @@ logger = logging.getLogger(__name__)
 
 class FrequencyView(views.APIView):
     """
-    View to take a list of frequencies and return the list of intervals between the lowest frequency
-    and each of the others.
+    Take a list of frequencies and return a list of intervals in cents between each one and a root note.
+    By default, the first frequency in the list is treated as the root note ('tonic', 'do', 'finalis' etc.).
+    If the root parameter is provided, intervals will be measured from that frequency.
     """
 
     serializer_class = FrequencySerializer
@@ -23,16 +24,21 @@ class FrequencyView(views.APIView):
             settings.PS_SETTINGS["LIST_STRING_SEPARATOR"]
         )
 
+        root = self.request.query_params.get("root")
+        if root and root.isnumeric():
+            ref_freq = root
+        else:
+            ref_freq = frequencies[0]
+
         # Validate frequencies and raise exception
         test = FrequencySerializer(data=[{"value": x} for x in frequencies], many=True)
         test.is_valid(raise_exception=True)
 
         scale = sorted(set(frequencies))  # Ordered list of unique frequencies
-        root = scale[0]
         cents = {}
-        for freq in scale[1:]:
-            cents[f"{root}-{freq}"] = utils.format_cents(
-                utils.cents_between(float(root), float(freq))
+        for freq in scale:
+            cents[f"{ref_freq}-{freq}"] = utils.format_cents(
+                utils.cents_between(float(ref_freq), float(freq))
             )
         return Response(cents)
 
