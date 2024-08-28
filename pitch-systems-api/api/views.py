@@ -13,8 +13,11 @@ logger = logging.getLogger(__name__)
 class FrequencyView(views.APIView):
     """
     Take a list of frequencies and return a list of intervals in cents between each one and a root note.
+
     By default, the first frequency in the list is treated as the root note ('tonic', 'do', 'finalis' etc.).
     If the root parameter is provided, intervals will be measured from that frequency.
+
+    Note: The root note does not have to be one of the provided frequencies.
     """
 
     serializer_class = FrequencySerializer
@@ -84,20 +87,23 @@ class IntervalViewset(viewsets.ReadOnlyModelViewSet):
         req_tolerance = self.request.query_params.get("tolerance")
 
         # Set tolerance if valid, otherwise fallback to default
-        if req_tolerance:
-            tolerance = req_tolerance
+        if req_tolerance and req_tolerance.isnumeric():
+            tolerance = int(req_tolerance)
 
-        if cents:
-            queryset = Interval.objects.all()
-            filters = {}
-            filters[f"cents__gte"] = int(cents) - int(tolerance)
-            filters[f"cents__lte"] = int(cents) + int(tolerance)
-            queryset = Interval.objects.filter(**filters)
-
-            result = self.serializer_class(queryset, many=True)
-            return Response(result.data)
-        else:
+        try:
+            cents = float(cents)
+        except ValueError:
             raise exceptions.ValidationError({"error": "Invalid cents value"})
+
+        queryset = Interval.objects.all()
+        filters = {}
+        filters[f"cents__gte"] = cents - tolerance
+        filters[f"cents__lte"] = cents + tolerance
+        queryset = Interval.objects.filter(**filters)
+
+        result = self.serializer_class(queryset, many=True)
+        return Response(result.data)
+            
         
 
 

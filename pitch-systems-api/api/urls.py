@@ -11,7 +11,7 @@ urlpatterns = [
     ),
     path("interval/<int:pk>/", IntervalViewset.as_view({'get': 'retrieve'}), name="interval_single"),
     path("intervals/", IntervalViewset.as_view({'get': 'list'}), name="interval_list"),
-    path("intervals/near/<int:cents>/", IntervalViewset.as_view({'get': 'get_near'}), name="intervals_near"),
+    path("intervals/near/<str:cents>/", IntervalViewset.as_view({'get': 'get_near'}), name="intervals_near"),
     path("frequencies/<str:frequencies>/", FrequencyView.as_view(), name="frequency_cents"),
     path("scale/<int:pk>/", ScaleViewset.as_view({'get': 'retrieve'}), name="scale_single"),
     path("scales/", ScaleViewset.as_view({'get': 'list'}), name="scale_list"),

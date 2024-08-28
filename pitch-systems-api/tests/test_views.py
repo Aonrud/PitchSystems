@@ -129,11 +129,11 @@ class IntervalTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_api_intervals_near(self):
+    def test_api_intervals_near_valid(self):
         response = self.client.get(
             reverse_querystring(
                 "intervals_near",
-                kwargs={"cents": "700"},
+                kwargs={"cents": "700.1234124143"},
                 query_kwargs={"tolerance": "3"},
             )
         )
@@ -142,6 +142,11 @@ class IntervalTests(APITestCase):
         self.assertContains(response, self.intervals[0])
         self.assertContains(response, self.intervals[1])
 
+    def test_api_intervals_near_invalid(self):
+        response = self.client.get(
+            reverse("intervals_near", kwargs={"cents": "abc"})
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class ScaleTests(APITestCase):
     @classmethod
