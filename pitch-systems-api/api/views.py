@@ -1,3 +1,4 @@
+from django.db.models import F, Func
 from rest_framework import generics, viewsets, views, exceptions
 from rest_framework.response import Response
 from pitches.models import *
@@ -44,6 +45,10 @@ class FrequencyView(views.APIView):
 
 
 class IntervalViewset(viewsets.ReadOnlyModelViewSet):
+    """
+    Get a list of intervals, optionally filtered to match a list of cents values.
+    """
+
     serializer_class = IntervalSerializer
 
     def get_queryset(self):
@@ -66,6 +71,34 @@ class IntervalViewset(viewsets.ReadOnlyModelViewSet):
             queryset = Interval.objects.filter(**filters)
 
         return queryset
+
+    def get_near(self, request, *args, **kwargs):
+        """
+        Get a list of intervals near the given cents value.
+        An optional 'tolerance' URL parameter allows filtering how many cents difference is considered 'near'. Otherwise, the default is used.
+        """
+
+        tolerance = 10
+
+        cents = self.kwargs["cents"]
+        req_tolerance = self.request.query_params.get("tolerance")
+
+        # Set tolerance if valid, otherwise fallback to default
+        if req_tolerance and req_tolerance.isnumeric():
+            tolerance = req_tolerance
+
+        if cents:
+            queryset = Interval.objects.all()
+            filters = {}
+            filters[f"cents__gte"] = cents - tolerance
+            filters[f"cents__lte"] = cents + tolerance
+            queryset = Interval.objects.filter(**filters)
+
+            result = self.serializer_class(queryset, many=True)
+            return Response(result.data)
+        else:
+            raise exceptions.ValidationError({"error": "Invalid cents value"})
+        
 
 
 class ScaleViewset(viewsets.ReadOnlyModelViewSet):
