@@ -9,10 +9,13 @@
 #Local reference files
 misc_files/
 
-
 #Python
 __pycache__/
 .venv/
 .coverage
 http_cache/
 staticfiles/
+
+#JS
+node_modules/
+.svelte-kit/

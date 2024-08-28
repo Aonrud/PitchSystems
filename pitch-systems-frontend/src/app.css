@@ -1,0 +1,17 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  a {
+    @apply text-emerald-800 hover:text-emerald-900 active:text-emerald-900 dark:text-emerald-200 dark:hover:text-emerald-100 dark:active:text-emerald-100;
+  }
+
+  button {
+    @apply p-2 rounded-md border border-stone-400 bg-stone-100 hover:border-stone-500 hover:bg-stone-200 dark:border-stone-600 dark:bg-stone-900 dark:hover:bg-stone-200;
+  }
+
+  body {
+    @apply bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100;
+  }
+}
