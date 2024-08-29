@@ -1,7 +1,5 @@
 <script lang="ts">
 import Frequencies from "./Frequencies.svelte";
-import Intervals from "./Intervals.svelte";
-import Scales from "./Scales.svelte";
 
 import AudioParser from "$lib/AudioParser";
 import Melody from "$lib/Melody";
@@ -27,6 +25,16 @@ cents = new Promise((resolve, reject) => {});
 intervals = new Promise((resolve, reject) => {}); 
 scales = new Promise((resolve, reject) => {});
 
+const psclient = new PSClient();
+
+let intervals_shown: Promise<Interval[]>
+intervals_shown = new Promise((resolve, reject) => {});
+
+const intervalData = (cents: number) => {
+  intervals_shown = psclient.getIntervalsNear(cents);
+
+}
+
 //If form is present, this is a new analysis
 if (form) {
   melody = new Melody(form.file.uuid, form.file.name, form.file.path);
@@ -35,7 +43,6 @@ if (form) {
     "https://cloud.aonghus.org/s/2L7T75zXagj7KBM/download?path=%2F&files=piano-BbMajor-Scale.wav";
 
   const parser = new AudioParser(`${test}`);
-  const psclient = new PSClient();
 
   freqs = parser.parse();
 
@@ -94,14 +101,25 @@ if (form) {
   {#await cents}
     <p>Getting intervals…</p>
   {:then result}
-      <div id="intervals" class="bg-white my-4">
-        <h3 class="text-lg font-bold">Intervals</h3>
-        <p class="my-4">Intervals in cents from the lowest frequency.</p>
-        <ul class="flex flex-row">
-            {#each Object.values(result) as item}
-                <li><button class="">{item}</button></li>
-            {/each}
+    <div id="intervals" class="bg-white my-4">
+      <h3 class="text-lg font-bold">Intervals</h3>
+      <p class="my-4">Intervals in cents from the root frequency.</p>
+      <div class="my-4">Root: </div>
+      <ul class="flex flex-row">
+          {#each Object.values(result) as item}
+              <li><button class="" on:click={() => intervalData(item)}>{item}</button></li>
+          {/each}
+      </ul>
+    </div>
+
+    <div id="intervals_shown" class="my-4 border-stone-400 border p-4">
+      {#await intervals_shown then data}
+        <ul class="list-none">
+          {#each data as interval}
+            <li><span class="cents">{interval.cents}</span>: {interval.name}</li>
+          {/each}
         </ul>
+      {/await}
     </div>
     {#await scales}
       <p>Getting scales…</p>

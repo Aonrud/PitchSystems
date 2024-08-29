@@ -12,6 +12,15 @@ export default class PSClient {
         return await this.query(endpoint, cents)
     }
 
+    async getIntervalsNear(cents: number, tolerance: number = 0): Promise<Interval[]> {
+        let endpoint = `/intervals/near/${Math.floor(cents)}/`
+        if (tolerance > 0) {
+            endpoint += `?tolerance=${tolerance}`
+        }
+        const result = await fetch(this.API_URL+endpoint);
+        return result.json()
+    }
+
     async getScales(intervals: Interval[]) : Promise<Scale[]> {
         const endpoint = "/scales/"
 
