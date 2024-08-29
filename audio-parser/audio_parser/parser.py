@@ -61,6 +61,9 @@ class AudioParser:
         self.min = settings["freq_min"]
         self.max = settings["freq_max"]
 
+        """Value to store results of current analysis. Should be reset on completion"""
+        self.results = []
+
     async def connect(self):
         async with websockets.serve(self.stream, "localhost", 5678):
             await asyncio.Future()  # run forever
@@ -83,8 +86,16 @@ class AudioParser:
             f0, voiced_flag, voiced_probs = librosa.pyin(
                 y_block, sr=sr, fmin=self.min, fmax=self.max
             )
+            self.parse_results((f0, voiced_flag, voiced_probs))
             await websocket.send(json.dumps(f0.tolist()))
             # await asyncio.sleep(random.random() * 2 + 1)
+
+    def parse_results(results: tuple):
+        for result in results:
+            print(result)
+
+
+
 
     def parse(self) -> dict:
         y, sr = librosa.load(self.data)
