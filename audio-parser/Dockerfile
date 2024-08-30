@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 ARG POETRY_VERSION=1.8.3
 RUN pip install poetry==$POETRY_VERSION
