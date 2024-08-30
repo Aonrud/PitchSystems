@@ -40,7 +40,7 @@ class AudioUrlHandler:
         file_check = requests.head(url)
 
         if not file_check.status_code == 200:
-            raise ValueError("URL can't be retrieved")
+            raise ValueError(f"URL can't be retrieved: {url}")
 
         mime = file_check.headers["Content-Type"].partition(";")[0]
 
