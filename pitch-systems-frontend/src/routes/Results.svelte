@@ -5,7 +5,7 @@ import AudioParser from "$lib/AudioParser";
 import Melody from "$lib/Melody";
 import { MelodyLocalStorage } from "$lib/MelodyStore";
 import PSClient from "$lib/PSClient";
-import type { AudioAnalysis, Interval, Scale } from "$lib/APITypes";
+import type { Frequency, Interval, Scale } from "$lib/APITypes";
 
 export let form;
 export let melody: Melody;
@@ -16,23 +16,51 @@ let message: string = "";
 
 //Instantiate each dataset as an unresolved promise.
 //Otherwise the initial 'undefined' value means await blocks will trigger immmediately.
-let freqs: Promise<AudioAnalysis>,
+let freqs: Promise<Frequency[]>,
   cents: Promise<object>,
   intervals: Promise<Interval[]>,
   scales: Promise<Scale[]>;
 freqs = new Promise((resolve, reject) => {});
 cents = new Promise((resolve, reject) => {});
-intervals = new Promise((resolve, reject) => {}); 
+intervals = new Promise((resolve, reject) => {});
 scales = new Promise((resolve, reject) => {});
+
+let freq_list: Frequency[] = [];
 
 const psclient = new PSClient();
 
-let intervals_shown: Promise<Interval[]>
+let intervals_shown: Promise<Interval[]>;
 intervals_shown = new Promise((resolve, reject) => {});
 
 const intervalData = (cents: number) => {
-  intervals_shown = psclient.getIntervalsNear(cents);
 
+  //If the interval is negative, get the octave equivalent
+  if (cents < 0) {
+    console.log(`cents was: ${cents}`)
+    cents = +cents + +1200
+    console.log(`Now: ${cents}`);
+  }
+  intervals_shown = psclient.getIntervalsNear(cents, 10);
+};
+
+const socketMessageListener = (e) => {
+  const data = JSON.parse(e.data);
+  
+  if (data.status == "error") {
+    message = data.message;
+    return
+  }
+
+
+  if (data.frequency) {
+    freq_list.push(data);
+    freq_list = freq_list;
+  }
+}
+
+const endOfAnalysis = () => {
+  freqs = Promise.resolve(freq_list);
+  cents = psclient.getCents(freq_list.map((f) => f.frequency));
 }
 
 //If form is present, this is a new analysis
@@ -40,48 +68,36 @@ if (form) {
   melody = new Melody(form.file.uuid, form.file.name, form.file.path);
   //TMP file for localhost testing
   const test =
-    "https://cloud.aonghus.org/s/2L7T75zXagj7KBM/download?path=%2F&files=piano-BbMajor-Scale.wav";
+    "https://cloud.aonghus.org/s/7CqCj6fZbYPxD4G/download?path=%2F&files=Piano_Gm_tune.wav";
 
-  const parser = new AudioParser(`${test}`);
+  const socket = new WebSocket("ws://localhost:5678");
+  socket.addEventListener("open", () => {
+    console.log("Parser socket open");
+    socket.send(JSON.stringify({ "url": test, "settings": { "cents_tolerance": 12, "duration_tolerance": 1 } }));
+  });
 
-  freqs = parser.parse();
+  socket.addEventListener("message", socketMessageListener);
 
-  freqs
-    .then((data) => {
-      melody.frequencies = data.freqs;
-      cents = psclient.getCents(data.freqs);
-      return cents;
-    })
-    .then((data) => {
-      melody.cents = Object.values(data);
-      intervals = psclient.getIntervals(Object.values(data));
-      return intervals;
-    })
-    .then((data) => {
-      melody.intervals = data;
-      scales = psclient.getScales(data);
-      return scales;
-    })
-    .then((data) => {
-      melody.scales = data;
-      try {
-        store.add(melody);
-      } catch (e) {
-        message =
-          "Can't save to local storage. Check that it is enabled in your browser.";
-      }
-    });
-  } else {
-    if (melody != undefined) {
-      freqs = Promise.resolve({ "freqs": melody.frequencies! })
-      cents = Promise.resolve(melody.cents!)
-      intervals = Promise.resolve(melody.intervals!)
-      scales = Promise.resolve(melody.scales!)
-    } else {
-      //STUB - no melody loaded
+  //Listen for end of analysis message.
+  //At end, resolve the frequency promise, convert to cents with psclient, and close the websocket.
+  socket.addEventListener("message", (e) => {
+    const data = JSON.parse(e.data);
+    if (data.message == "End of analysis") {
+      freqs = Promise.resolve(freq_list);
+      cents = psclient.getCents(freq_list.map((f) => f.frequency));
+      socket.close();
     }
+  })
 
-  }
+  form = null
+} else if (melody) {
+    freqs = Promise.resolve(melody.frequencies!);
+    cents = Promise.resolve(melody.cents!);
+    intervals = Promise.resolve(melody.intervals!);
+    scales = Promise.resolve(melody.scales!);
+} else {
+  //STUB - no analysis to show
+}
 </script>
 
 {#if message.length > 0}
@@ -94,43 +110,37 @@ if (form) {
   <audio src="/{melody.path}" controls class="mx-auto" />
 </div>
 
+<Frequencies {freq_list} />
+
 {#await freqs}
-  <p>Getting frequencies…</p>
-{:then result}
-  <Frequencies freqs={result.freqs} />
+Analysing frequencies…
+{:then _}
   {#await cents}
-    <p>Getting intervals…</p>
-  {:then result}
-    <div id="intervals" class="bg-white my-4">
+  <p>Getting cent values…</p>
+  {:then data}
+    <div id="intervals" class="my-4 bg-white">
       <h3 class="text-lg font-bold">Intervals</h3>
       <p class="my-4">Intervals in cents from the root frequency.</p>
-      <div class="my-4">Root: </div>
-      <ul class="flex flex-row">
-          {#each Object.values(result) as item}
-              <li><button class="" on:click={() => intervalData(item)}>{item}</button></li>
-          {/each}
+      <div class="my-4">Root:</div>
+      <ul class="flex flex-row flex-wrap">
+        {#each Object.values(data) as item}
+          <li class="min-w-fit p-2 m-2">
+            <button class="" on:click={() => intervalData(item)}>{item}</button>
+          </li>
+        {/each}
       </ul>
     </div>
 
-    <div id="intervals_shown" class="my-4 border-stone-400 border p-4">
+    <div id="intervals_shown" class="my-4 border border-stone-400 p-4">
       {#await intervals_shown then data}
         <ul class="list-none">
           {#each data as interval}
-            <li><span class="cents">{interval.cents}</span>: {interval.name}</li>
+            <li>
+              <span class="cents">{interval.cents}</span>: {interval.name}
+            </li>
           {/each}
         </ul>
       {/await}
     </div>
-    {#await scales}
-      <p>Getting scales…</p>
-    {:then scales}
-      <div id="scales">
-        <ul>
-            {#each scales as scale}
-                <li>{scale.name}</li>
-            {/each}
-        </ul>
-    </div>
-    {/await}
   {/await}
 {/await}

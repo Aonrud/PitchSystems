@@ -18,7 +18,12 @@ class SocketHandler:
         self.port = port
 
     async def connect(self):
-        async with websockets.serve(self.handler, self.host, self.port):
+        async with websockets.serve(
+            self.handler,
+            self.host,
+            self.port,
+            reuse_port=True,
+        ):
             await asyncio.Future()  # run forever
 
     async def handler(self, websocket):
@@ -32,31 +37,29 @@ class SocketHandler:
         try:
             data = json.loads(message)
             if data["url"]:
-                
+
                 audio = AudioUrlHandler(url=data["url"])
                 parser = AudioParser("config.yaml")
 
                 # Check if any settings adjustments have been passed
                 if data["settings"]:
-                    parser.applySettings(data["settings"])         
-                
+                    parser.applySettings(data["settings"])
+
                 # Parse the audio
                 await parser.stream(audio.get(), websocket)
         except json.JSONDecodeError:
-            await websocket.send(json.dumps({
-                "status": "error",
-                "message": "Received an invalid message."
-            }))
+            await websocket.send(
+                json.dumps(
+                    {"status": "error", "message": "Received an invalid message."}
+                )
+            )
 
     async def validate(message):
 
-
-        await websocket.send(json.dumps({
-            "status": "error",
-            "message": "Received an invalid message."
-        }))
+        await websocket.send(
+            json.dumps({"status": "error", "message": "Received an invalid message."})
+        )
         return False
-
 
     async def bin_message(self, message, websocket):
         pass

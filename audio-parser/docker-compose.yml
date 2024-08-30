@@ -3,5 +3,5 @@ services:
     build: .
     container_name: "audio-parser"
     ports:
-      - 127.0.0.1:${PORT}:${GUNICORN_PORT}
+      - 127.0.0.1:${PORT}:5678
     restart: unless-stopped

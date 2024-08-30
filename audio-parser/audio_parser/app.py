@@ -11,10 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 
-async def run():
+async def main():
     socket = SocketHandler("localhost", 5678)
+
+    # Start the connection
     await socket.connect()
 
 
 if __name__ == "__main__":
-    asyncio.run(run())
+    asyncio.run(main())

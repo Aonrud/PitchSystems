@@ -1,12 +1,12 @@
-import type { Interval, Scale } from './APITypes';
+import type { Frequency, Interval, Scale } from './APITypes';
 
 export default class Melody {
     readonly id: string;
     readonly path: string;
 
     name: string;
-    frequencies?: number[];
-    cents?: number[];
+    frequencies?: Frequency[];
+    cents?: { value: number, selected: Interval}[]
     intervals?: Interval[];
     scales?: Scale[];
 

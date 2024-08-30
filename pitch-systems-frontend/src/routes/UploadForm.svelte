@@ -25,6 +25,7 @@
   </div>
   <button
     class="
+    p-2 rounded-md border
     border-emerald-900 bg-emerald-700 text-emerald-50
     hover:border-emerald-900 hover:bg-emerald-600
     dark:border-emerald-500 dark:bg-emerald-400 dark:text-emerald-900

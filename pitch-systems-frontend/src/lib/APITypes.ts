@@ -1,8 +1,9 @@
 //STUBS
 
-export type AudioAnalysis = {
-    freqs: number[],
-
+export type Frequency = {
+    slices: number,
+    start: number,
+    frequency: number
 }
 
 export type Interval = {

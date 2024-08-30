@@ -1,5 +1,7 @@
 <script lang="ts">
-export let freqs: number[];
+    import type { Frequency } from "$lib/APITypes";
+
+export let freq_list: Frequency[];
 
 //Graph scale
 //Set inverted so contents will expand (saves checking for first case)
@@ -17,9 +19,23 @@ const setMax = (num: number) => {
 const setMin = (num: number) => {
   min = Math.floor(num);
 };
+
+const getWidth = (freq: Frequency) => {
+  const total = freq_list.reduce((sum, frequency) => {
+    console.log(sum);
+    console.log(frequency)
+    return { "slices": sum.slices + frequency.slices}
+  }, {"slices": 0}).slices;
+
+  console.log(`Total: ${total}`)
+  return (freq.slices/total) * 100;
+}
 </script>
 
 <div id="frequencies" class="flex h-60 border-b border-stone-700 bg-white">
+  <div class="hidden">
+    {freq_list}
+  </div>
   <div
     class="z-50 flex w-3 flex-col justify-between border-l border-stone-700 text-xs text-stone-500"
   >
@@ -27,20 +43,20 @@ const setMin = (num: number) => {
     <div class="-rotate-90">Hertz</div>
     <div>{min}</div>
   </div>
-  {#each freqs as freq}
-    {#if freq > max - p_top}
-      {setMax(freq + p_top)}
+  {#each freq_list as freq}
+    {#if freq.frequency > max - p_top}
+      {setMax(freq.frequency + p_top)}
     {/if}
-    {#if freq < min + p_bottom}
-      {setMin(freq -p_bottom)}
+    {#if freq.frequency < min + p_bottom}
+      {setMin(freq.frequency -p_bottom)}
     {/if}
-    <div class="flex grow flex-col justify-end overflow-hidden">
+    <div class="flex grow flex-col justify-end overflow-hidden" style="width: {getWidth(freq)}%" data-slices="{freq.slices}" data-start="{freq.start}">
       <div
-        title="{freq.toString()}Hz"
+        title="{freq.frequency.toString()}Hz"
         class="w-full border-t border-stone-700 bg-stone-100"
-        style="height: {Math.floor(((freq-min)/(max-min))*100)}%"
+        style="height: {Math.floor(((freq.frequency-min)/(max-min))*100)}%"
       >
-        <div class="text-center text-xs text-stone-500">{freq.toFixed(2)}</div>
+        <div class="text-center text-xs text-stone-500">{freq.frequency.toFixed(2)}</div>
       </div>
     </div>
   {/each}

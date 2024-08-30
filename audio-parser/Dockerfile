@@ -20,4 +20,4 @@ RUN poetry install --without dev
 
 COPY . .
 
-CMD ["poetry", "run", "gunicorn", "--config", "audio_parser/gunicorn_conf.py", "audio_parser.app:app"]
+CMD ["poetry", "run", "supervisord", "-c", "supervisord.conf"]

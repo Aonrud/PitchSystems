@@ -14,7 +14,7 @@ class FrequencyView(views.APIView):
     """
     Take a list of frequencies and return a list of intervals in cents between each one and a root note.
 
-    By default, the first frequency in the list is treated as the root note ('tonic', 'do', 'finalis' etc.).
+    By default, the last frequency in the list is treated as the root note ('tonic', 'do', 'finalis' etc.).
     If the root parameter is provided, intervals will be measured from that frequency.
 
     Note: The root note does not have to be one of the provided frequencies.
@@ -32,7 +32,7 @@ class FrequencyView(views.APIView):
         if root:
             ref_freq = root
         else:
-            ref_freq = frequencies[0]
+            ref_freq = frequencies[-1]
 
         # Validate frequencies and raise exception
         test = FrequencySerializer(data=[{"value": x} for x in frequencies], many=True)
