@@ -13,10 +13,9 @@ class SocketHandler:
     Set up and handle the websocket
     """
 
-    def __init__(self, host: str, port: int, audio_parser: AudioParser):
+    def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
-        self.audio_parser = audio_parser
 
     async def connect(self):
         async with websockets.serve(self.handler, self.host, self.port):
@@ -33,8 +32,16 @@ class SocketHandler:
         try:
             data = json.loads(message)
             if data["url"]:
+                
                 audio = AudioUrlHandler(url=data["url"])
-                await self.audio_parser.stream(audio.get(), websocket)
+                parser = AudioParser("config.yaml")
+
+                # Check if any settings adjustments have been passed
+                if data["settings"]:
+                    parser.applySettings(data["settings"])         
+                
+                # Parse the audio
+                await parser.stream(audio.get(), websocket)
         except json.JSONDecodeError:
             await websocket.send(json.dumps({
                 "status": "error",

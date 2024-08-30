@@ -1,5 +1,5 @@
 cents_tolerance: 10
-freq_min: 50
-freq_max: 11000
+min: 50
+max: 11000
 prob_tolerance: 0.1
-duration_tolerance: 0
+duration_tolerance: 8

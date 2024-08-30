@@ -12,9 +12,8 @@ from pathlib import Path
 import json
 from urllib.request import urlopen
 import soundfile
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+from datetime import timedelta
+import yaml
 
 class AudioUrlHandler:
     """
@@ -25,7 +24,10 @@ class AudioUrlHandler:
         self.validate_url(url)
         self.url = url
         self.session = CachedSession(
-            "http_cache", backend=FileCache(decode_content=False), stream=True
+            "http_cache",
+            backend=FileCache(decode_content=False),
+            stream=True,
+            expire_after=timedelta(days=1),
         )
 
     def validate_url(self, url: str) -> None:
@@ -51,25 +53,67 @@ class AudioUrlHandler:
         # Could become invalid between instantiation and fetch
         self.validate_url(self.url)
         response = self.session.get(self.url)
-        # print(response.content)
         f = BytesIO(response.content)
         return soundfile.SoundFile(f)
 
 
+class Note:
+    """
+    Represents a note object as they are sent by the parser.
+    """
+
+    start: int
+    slices: int
+    frequency: float
+
+
 class AudioParser:
 
-    def __init__(self, settings: dict) -> None:
-        self.cents_tolerance = settings["cents_tolerance"]
-        self.min = settings["freq_min"]
-        self.max = settings["freq_max"]
-        self.prob_tolerance = settings["prob_tolerance"]
-        self.duration_tolerance = settings["duration_tolerance"]
+    def __init__(self, conf_path: str) -> None:
+        """
+        param: conf_path Path to the configuration file, relative to the project root.
+        """
+
+        # Assign all valid settings with empty values
+        self.settings: dict = {
+            "cents_tolerance": None,
+            "min": None,
+            "max": None,
+            "prob_tolerance": None,
+            "duration_tolerance": None,
+        }
+
+        config: dict
+
+        # Load config file
+        try:
+            BASE_DIR = Path(__file__).resolve().parent.parent
+            conf_file = open(BASE_DIR / conf_path, "r")
+            config = yaml.safe_load(conf_file)
+        except OSError:
+            raise Exception("Can't read configuration file. Please check it exists and is readable.")
+
+        self.applySettings(config)
+
+        if None in self.settings.values():
+            # Can't have empty settings in the default config
+            raise Exception("Configuration issue. Please check config.yaml for errors.")
 
         # Temporary variables used during streaming
-        self.note_buffer: object = None
+        self.note_buffer: Note = None
+        self.short_buffer: Note = None
         self.total_slices = 0
         self.notes_sent = 0
         self.below_prob = 0
+
+    def applySettings(self, settings: dict):
+        """
+        Apply a settings dict.
+        """
+        for key in settings:
+            if key in self.settings:
+                print(f"Setting {key} to {settings.get(key)}")
+                self.settings[key] = settings.get(key)
 
     async def stream(self, file, websocket):
         n_fft = 2048
@@ -86,15 +130,16 @@ class AudioParser:
         )
 
         for y_block in stream:
-            result = librosa.pyin(y_block, sr=sr, fmin=self.min, fmax=self.max)
+            result = librosa.pyin(
+                y_block, sr=sr, fmin=self.settings["min"], fmax=self.settings["max"]
+            )
             await self.parse_result(result, websocket)
 
         # Send the final buffered note
         # TODO: This isn't DRY
         buffer = self.note_buffer
-        if buffer["duration"] < self.duration_tolerance:
-            buffer["frequency"] = 0
-        await websocket.send(json.dumps(self.note_buffer))
+        if buffer["slices"] >= self.settings["duration_tolerance"]:
+            await websocket.send(json.dumps(self.note_buffer))
 
         # Send a conclusion
         final = {
@@ -102,7 +147,7 @@ class AudioParser:
             "message": "End of analysis",
             "notes_sent": self.notes_sent,
             "slices": self.total_slices,
-            "below_prob": self.below_prob
+            "below_prob": self.below_prob,
         }
 
         await websocket.send(json.dumps(final))
@@ -119,7 +164,8 @@ class AudioParser:
         """
         Parse a block of results from the analysis stream.
 
-        The stream of frequencies and probabilities is held until discrete notes are found.
+        Slices of the stream are merged into a Note() when they meet the matching criteria.
+
         Notes are then queued for sending on the websocket.
         """
         slices = 0
@@ -127,24 +173,26 @@ class AudioParser:
 
         for slice in zip(*result):
             freq, voiced, prob = slice
-            if prob < self.prob_tolerance:
+            if prob < self.settings["prob_tolerance"]:
                 self.below_prob += 1
 
             # The frequency is only considerd if it is voiced and above the probability tolerance
-            if voiced and prob >= self.prob_tolerance:
+            if voiced and prob >= self.settings["prob_tolerance"]:
 
                 # If this isn't the first slice of a new group
                 if len(group) > 0:
-                    group_avg = statistics.mean(group)
-                    diff = interval(freq, group_avg)
+                    # group_avg = statistics.mean(group)
+                    # diff = interval(freq, group_avg)
 
-                    if abs(diff) > self.cents_tolerance:
+                    diff = interval(freq, group[-1])
+
+                    if abs(diff) > self.settings["cents_tolerance"]:
                         # The note in the group is finished. Send it to the queue.
                         start = self.total_slices - slices
                         note = {
                             "start": start,
-                            "duration": slices,
-                            "frequency": group_avg,
+                            "slices": slices,
+                            "frequency": statistics.mean(group),
                         }
                         to_send = self.queue_note(note)
                         if to_send:
@@ -164,45 +212,57 @@ class AudioParser:
                     slices += 1
             self.total_slices += 1
 
-    def queue_note(self, note: object) -> object | None:
+    def queue_note(self, note: Note) -> Note | None:
         """
         Queue a note for sending.
 
         Returns a note if there is one due for sending, otherwise returns None.
 
-        Each note is retained in a buffer and compared with the next. If they are the same (within the cents tolerance), they are merged.
-        This prevents a note that is split across streamed chunks being sent as two separate notes.
+        Each note is retained in a buffer and compared with the next. If the notes are equal they are merged.
 
+        A note is returned for sending only once a subsequent note has been queued that matches the sending criteria.
         """
         buffer = self.note_buffer
 
-        if buffer:
-            diff = interval(note["frequency"], buffer["frequency"])
+        if not buffer:
+            self.note_buffer = note
+            return None
 
-            if abs(diff) <= self.cents_tolerance:
-                # Merge the two notes and update
+        match = self.notes_match(buffer, note)
 
-                # Average based on slice count (i.e. not just the two values)
-                mean = (
-                    note["duration"] * note["frequency"]
-                    + buffer["duration"] * buffer["frequency"]
-                ) / (note["duration"] + buffer["duration"])
+        if match:
+            # Note matches the buffer so merge it in
+            self.note_buffer = self.notes_merge(buffer, note)
+        else:
+            # Update the buffer and return the old buffer for sending
+            self.note_buffer = note
 
-                note = {
-                    "start": buffer["start"],
-                    "duration": note["duration"] + buffer["duration"],
-                    "frequency": mean,
-                }
-            else:
-                # Update the buffer and return the old buffer for sending
-                self.note_buffer = note
-
-                # If the final note is below the duration threshold, zero out the frequency as noise
-                if buffer["duration"] < self.duration_tolerance:
-                    buffer["frequency"] = 0
-
+            # If the final note is above the duration threshold, send it. Otherwise, drop it.
+            if buffer["slices"] >= self.settings["duration_tolerance"]:
                 return buffer
+            else:
+                print("Dropped note:")
+                print(buffer)
 
-        # If the buffer hasn't been returned, it should now be updated
-        self.note_buffer = note
-        return None
+    def notes_merge(self, note1: Note, note2: Note) -> Note:
+        """
+        Merge two note objects.
+        """
+        new_length = note1["slices"] + note2["slices"]
+        # The new frequency should average the two.
+        # Since we no longer have the individual slice values, the relative size is accounted for below instead of taking a crude average of the two.
+        freq = (
+            (note1["slices"] * note1["frequency"])
+            + (note2["slices"] * note2["frequency"])
+        ) / new_length
+        return {"slices": new_length, "start": note1["start"], "frequency": freq}
+
+    def notes_match(self, note1: Note, note2: Note) -> bool:
+        """
+        Check if two notes match, within the cents tolerance range.
+        """
+        diff = interval(note1["frequency"], note2["frequency"])
+        if abs(diff) <= self.settings["cents_tolerance"]:
+            return True
+
+        return False
