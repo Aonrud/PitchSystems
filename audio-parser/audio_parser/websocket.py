@@ -6,7 +6,7 @@ import librosa
 import websockets
 import json
 from audio import *
-
+import os
 
 class SocketHandler:
     """
@@ -18,11 +18,18 @@ class SocketHandler:
         self.port = port
 
     async def connect(self):
-        async with websockets.serve(
+        sockdir = "/run/sockets/"
+        sockfile = "audio-parser.sock"
+        # Give socket a unique name if running under Supervisor
+        if "SUPERVISOR_PROCESS_NAME" in os.environ:
+            sockfile = f"{os.environ['SUPERVISOR_PROCESS_NAME']}.sock"
+        
+        socket = sockdir + sockfile
+        print(f"Socket will be created at {socket}")
+
+        async with websockets.unix_serve(
             self.handler,
-            self.host,
-            self.port,
-            reuse_port=True,
+            path=socket,
         ):
             await asyncio.Future()  # run forever
 

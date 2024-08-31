@@ -2,6 +2,7 @@
 .~
 .directory
 .kate-swp
+*.log
 
 # Private values
 .env
