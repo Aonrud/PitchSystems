@@ -181,10 +181,8 @@ class AudioParser:
 
                 # If this isn't the first slice of a new group
                 if len(group) > 0:
-                    # group_avg = statistics.mean(group)
-                    # diff = interval(freq, group_avg)
-
-                    diff = interval(freq, group[-1])
+                    diff = interval(freq, statistics.mean(group))
+                    #diff = interval(freq, group[-1])
 
                     if abs(diff) > self.settings["cents_tolerance"]:
                         # The note in the group is finished. Send it to the queue.
