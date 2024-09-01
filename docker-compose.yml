@@ -1,0 +1,71 @@
+services:
+  site:
+    build: ./pitch-systems-frontend
+    container_name: "pitch-systems-site"
+    volumes:
+      - site-static:/static
+    networks:
+      - parser
+    depends_on:
+        - parser
+        - parser-server
+        - api
+        - api-db
+    ports:
+      - 127.0.0.1:${SITE_PUBLIC_PORT}:3000
+  parser:
+    build: ./audio-parser
+    container_name: "audio-parser"
+    restart: unless-stopped
+    volumes:
+      - sockets:/run/sockets
+    networks:
+      - socket-link
+  parser-server:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - sockets:/run/sockets
+    networks:
+      - socket-link
+      - parser
+    depends_on:
+      - parser
+    ports:
+      - ${PORT}:8080
+  api:
+    build: ./pitch-systems-api
+    container_name: "pitch-systems-api"
+    networks:
+      - api-db
+    depends_on:
+      - api-db
+    ports:
+      - 127.0.0.1:${API_PUBLIC_PORT}:8000
+    environment:
+      DEBUG: ${DEBUG}
+      MARIADB_HOST: "db"
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_NAME}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    restart: unless-stopped
+  api-db:
+    image: mariadb:10
+    networks:
+      - api-db
+    volumes:
+      - api-db:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_NAME}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    restart: unless-stopped
+volumes:
+  api-db:
+networks:
+  api-db:
+  socket-link:
+  parser:
+
