@@ -54,22 +54,26 @@ class FrequencyTests(APITestCase):
         response = self.client.get(
             reverse("frequency_cents", kwargs={"frequencies": self.freqs_valid})
         )
-        expected = {
-            "327.0320-327.0320": "0.0000",
-            "327.0320-261.6256": "-386.3137",
-            "327.0320-392.4384": "315.6413",
-        }
+        expected = [
+            {"cents": "-701.9550", "f1": "392.4384", "f2": "261.6256"},
+            {"cents": "-315.6413", "f1": "392.4384", "f2": "327.0320"},
+            {"cents": "0.0000", "f1": "392.4384", "f2": "392.4384"},
+        ]
         self.assertEqual(response.data, expected)
 
     def test_frequency_view_with_root_valid(self):
         response = self.client.get(
-            reverse_querystring("frequency_cents", kwargs={"frequencies": self.freqs_valid}, query_kwargs={"root": "261.6256"})
+            reverse_querystring(
+                "frequency_cents",
+                kwargs={"frequencies": self.freqs_valid},
+                query_kwargs={"root": "261.6256"},
+            )
         )
-        expected = {
-            "261.6256-327.0320": "386.3137",
-            "261.6256-261.6256": "0.0000",
-            "261.6256-392.4384": "701.9550",
-        }
+        expected = [
+            {"cents": "0.0000", "f1": "261.6256", "f2": "261.6256"},
+            {"cents": "386.3137", "f1": "261.6256", "f2": "327.0320"},
+            {"cents": "701.9550", "f1": "261.6256", "f2": "392.4384"},
+        ]
         self.assertEqual(response.data, expected)
 
     def test_frequency_view_invalid(self):
@@ -143,10 +147,9 @@ class IntervalTests(APITestCase):
         self.assertContains(response, self.intervals[1])
 
     def test_api_intervals_near_invalid(self):
-        response = self.client.get(
-            reverse("intervals_near", kwargs={"cents": "abc"})
-        )
+        response = self.client.get(reverse("intervals_near", kwargs={"cents": "abc"}))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class ScaleTests(APITestCase):
     @classmethod

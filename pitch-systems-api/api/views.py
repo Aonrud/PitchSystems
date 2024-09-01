@@ -39,10 +39,16 @@ class FrequencyView(views.APIView):
         test.is_valid(raise_exception=True)
 
         scale = sorted(set(frequencies))  # Ordered list of unique frequencies
-        cents = {}
+        cents = []
         for freq in scale:
-            cents[f"{ref_freq}-{freq}"] = utils.format_cents(
-                utils.cents_between(float(ref_freq), float(freq))
+            cents.append(
+                {
+                    "cents": utils.format_cents(
+                        utils.cents_between(float(ref_freq), float(freq))
+                    ),
+                    "f1": ref_freq,
+                    "f2": freq,
+                }
             )
         return Response(cents)
 
@@ -103,8 +109,6 @@ class IntervalViewset(viewsets.ReadOnlyModelViewSet):
 
         result = self.serializer_class(queryset, many=True)
         return Response(result.data)
-            
-        
 
 
 class ScaleViewset(viewsets.ReadOnlyModelViewSet):
