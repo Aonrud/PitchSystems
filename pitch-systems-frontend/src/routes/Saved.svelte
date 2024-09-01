@@ -8,7 +8,7 @@
     let list = store.list()
 
     const loadMelody = (id: string) => {
-        melody = store.get(id);
+        melody = store.get(id)!;
     }
 </script>
 

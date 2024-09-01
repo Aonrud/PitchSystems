@@ -6,6 +6,12 @@ export type Frequency = {
     frequency: number
 }
 
+export type Cents = {
+    cents: number,
+    f1: number,
+    f2: number
+}
+
 export type Interval = {
     id: number,
     name: string,

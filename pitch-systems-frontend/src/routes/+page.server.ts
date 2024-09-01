@@ -30,6 +30,7 @@ export const actions = {
     let name = ( file.name.lastIndexOf(".") > 0 ? file.name.substring(0, file.name.lastIndexOf(".")) : file.name );
     name = name.replaceAll(/[_-]+/g," ") //Swap typical space-replacing chars in the filename
 
+    console.log(path);
     return {
       success: true,
       file: {

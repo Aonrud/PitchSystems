@@ -6,25 +6,19 @@ import Melody from '$lib/Melody';
 abstract class MelodyStore {
 
     /**
-     * Add an item to the storage
+     * Add a melody to the storage, or update it if it already exists.
      * @param key 
      * @param value 
      * @return boolean Depending on success.
      */
-    abstract add(melody: Melody): boolean
+    abstract save(melody: Melody): boolean
 
     /**
-     * Get an item from storage.
+     * Get an item from storage, if it exists.
      * @param id 
      * @return Melody
      */
     abstract get(id: string): Melody
-    /**
-     * 
-     * @param key 
-     * @param value 
-     */
-    abstract update(id: string, melody: Melody): boolean
 
     /**
      * 
@@ -57,8 +51,13 @@ export class MelodyLocalStorage extends MelodyStore {
         }
     }
 
-    add(melody: Melody) {
-        this.melodies.push(melody.id);
+    save(melody: Melody) {
+        
+        //New entry
+        if (this.melodies.indexOf(melody.id) == -1) {
+            this.melodies.push(melody.id)
+        }
+
         try {
             localStorage.setItem("audio_list", JSON.stringify(this.melodies));
             localStorage.setItem(melody.id, JSON.stringify(melody));
@@ -72,18 +71,18 @@ export class MelodyLocalStorage extends MelodyStore {
 
     get(id: string) {
         const data = localStorage.getItem(id)
-        if (data !== null) {
-            return JSON.parse(data);
-        }
-    }
 
-    update(id: string, melody: Melody) {
-        const index = this.melodies.indexOf(id);
-        if (index == -1) {
-            return false;
+        if (data == null) {
+            throw new Error("Invalid id requested");
         }
-        localStorage.setItem(id, JSON.stringify(melody));
-        return true;
+
+        const obj = JSON.parse(data);
+        console.log(obj);
+        const melody = new Melody(obj.id, obj.name, obj.path);
+        for (const [k,v] of Object.entries(obj)) {
+            if (melody.hasOwnProperty(k)) melody[k] = v //Tidy up typing here
+        }
+        return melody;
     }
 
     remove(id: string) {
@@ -106,6 +105,8 @@ export class MelodyLocalStorage extends MelodyStore {
         const list = localStorage.getItem("audio_list");
         if (list) {
             this.melodies = JSON.parse(list);
+        } else {
+            this.melodies = [];
         }
     }
 }
