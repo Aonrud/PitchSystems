@@ -1,12 +1,8 @@
-import validators
-import requests
-from requests_cache import CachedSession, FileCache
-from io import BytesIO
-import librosa
 import websockets
 import json
 from audio import *
 import os
+import asyncio
 
 class SocketHandler:
     """
@@ -62,11 +58,11 @@ class SocketHandler:
     async def handler(self, websocket):
         async for message in websocket:
             if isinstance(message, str):
-                await self.str_message(message, websocket)
+                await self.message(message, websocket)
             else:
-                await self.bin_message(message, websocket)
+                pass # No binary messages expected on this interface, so discard
 
-    async def str_message(self, message: str, websocket):
+    async def message(self, message: str, websocket):
         try:
             data = json.loads(message)
             if data["url"]:
@@ -86,13 +82,3 @@ class SocketHandler:
                     {"status": "error", "message": "Received an invalid message."}
                 )
             )
-
-    async def validate(message):
-
-        await websocket.send(
-            json.dumps({"status": "error", "message": "Received an invalid message."})
-        )
-        return False
-
-    async def bin_message(self, message, websocket):
-        pass

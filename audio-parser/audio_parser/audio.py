@@ -3,17 +3,14 @@ import requests
 from requests_cache import CachedSession, FileCache
 from io import BytesIO
 import librosa
-from cents import *
 import statistics
 import numpy
-import asyncio
-import websockets
 from pathlib import Path
 import json
-from urllib.request import urlopen
 import soundfile
 from datetime import timedelta
 import yaml
+from cents import interval
 
 class AudioUrlHandler:
     """
@@ -35,7 +32,7 @@ class AudioUrlHandler:
         Check that a URL is valid, available and represents an audio file.
         """
         # Check the string is a url
-        if not validators.url(url):
+        if not validators.url(url, simple_host=True):
             raise ValueError("Invalid URL")
 
         # Check the URL returns an audio file
