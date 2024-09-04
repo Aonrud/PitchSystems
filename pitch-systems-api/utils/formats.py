@@ -1,5 +1,8 @@
-def format_cents(cents: float) -> str:
+from decimal import Decimal
+
+def format_number(num: float) -> Decimal:
     """
-    Format a cents float for output.
+    Format a float for fixed-length output, while retaining number type.
     """
-    return "{:.4f}".format(cents)
+
+    return Decimal(num).quantize((Decimal('.0001')))

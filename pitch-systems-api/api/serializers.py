@@ -53,3 +53,11 @@ class FrequencySerializer(serializers.Serializer):
     """
 
     value = serializers.FloatField(required=True)
+
+class BasicSerializer(serializers.Serializer):
+    """
+    Serializer for models that only have the base model fields.
+    """
+    class Meta:
+        model = AbstractBaseModel
+        fields = ("id", "name", "description")

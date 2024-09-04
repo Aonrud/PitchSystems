@@ -43,11 +43,11 @@ class FrequencyView(views.APIView):
         for freq in scale:
             cents.append(
                 {
-                    "cents": utils.format_cents(
+                    "cents": utils.format_number(
                         utils.cents_between(float(ref_freq), float(freq))
                     ),
-                    "f1": ref_freq,
-                    "f2": freq,
+                    "f1": utils.format_number(ref_freq),
+                    "f2": utils.format_number(freq),
                 }
             )
         return Response(cents)
@@ -138,4 +138,29 @@ class ScaleViewset(viewsets.ReadOnlyModelViewSet):
             queryset = Scale.objects.filter(intervals=intervals_valid[0]).intersection(
                 *intersections
             )
+        return queryset
+
+class SystemViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Get a pitch system by id, or the full list.
+    """
+
+    serializer_class = BasicSerializer
+    queryset = System.objects.all()
+
+class NomenclatureViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Get a pitch system by id, or the full list.
+    """
+
+    serializer_class = BasicSerializer
+    
+    def get_queryset(self):
+        queryset = Nomenclature.objects.all()
+
+        # Filter by term
+        term = self.kwargs.get("term")
+        if term:
+            queryset = Interval.objects.filter(name=term)
+
         return queryset

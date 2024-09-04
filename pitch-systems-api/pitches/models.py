@@ -63,11 +63,26 @@ class Scale(AbstractBaseModel):
     Model for a scale or set of intervals
     """
 
-    intervals = models.ManyToManyField(Interval)
+    intervals = models.ManyToManyField(
+        Interval,
+        through="IntervalRole",
+        through_fields=("scale", "interval")
+    )
     system = models.ForeignKey(System, on_delete=models.CASCADE)
+    root = models.DecimalField(max_digits=10, decimal_places=4, null=True, blank=True)
 
     ordering = ["name"]
     autocomplete_fields = ["intervals"]
 
     def __str__(self):
         return self.name
+
+class IntervalRole(models.Model):
+    """
+    Model for information about the role of an interval in a scale.
+    """
+    role = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    interval = models.ForeignKey(Interval, on_delete=models.CASCADE)
+    scale = models.ForeignKey(Scale, on_delete=models.CASCADE)
+    
