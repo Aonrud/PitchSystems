@@ -32,7 +32,7 @@ services:
     depends_on:
       - parser
     ports:
-      - ${PORT}:8080
+      - ${PARSER_PUBLIC_PORT}:8080
   api:
     build: ./pitch-systems-api
     container_name: "pitch-systems-api"
