@@ -1,6 +1,20 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import Melody from "$lib/Melody";
   export let form;
+  export let melody: Melody;
+
+  const formSubmit = () => {
+    return ({ result, update }) => {
+        if (result.type === "success") {
+            melody = new Melody(result.data.file.id, result.data.file.name, result.data.file.path);
+        }
+        else {
+            update();
+        }
+    }
+}
+
 </script>
 
 <form

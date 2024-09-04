@@ -15,7 +15,7 @@ export default class Melody {
     frequencies: Frequency[] = [];
     root?: number;
     cents: Cents[] = [];
-    intervals: { cents: number, match: Interval}[] = [];
+    intervals: Partial<Record<string, Interval|null>> = {};
     scales: Scale[] = [];
 
     constructor(id: string, name: string, path: string) {
@@ -25,12 +25,46 @@ export default class Melody {
     }
 
     /**
-     * Get a list of cents values for stored intervals.
-     * 
-     * @returns number[]
+     * Set the cents values and add corresponding empty interval matches.
+     * @param cents
      */
-    getCentsValues() {
-        return this.intervals?.map((c) => c.cents)
+    setCents(cents: Cents[]) {
+        //Remove the unison interval
+        cents = cents.filter((c) => c.cents !== 0);
+        this.cents = cents;
+        const intervals: Partial<Record<string, Interval|null>> = {}
+        for (const c of cents) {
+            if (c.cents !== 0) {
+                intervals[c.cents.toString()] = null;
+            }
+        }
+        this.intervals = intervals;
+    }
+
+    /**
+     * Get the interval set as a match for the given cents value, if it is set.
+     * 
+     * @param cents 
+     * 
+     * @returns Interval|null
+     */
+    getCentsMatch(cents: number): Interval|null {
+       if (this.intervals[cents]) {
+        return this.intervals[cents.toString()]!
+       }
+       return null;
+    }
+
+    /**
+     * Set the interval selected to match the given cents value.
+     * 
+     * If the interval is already set, it will be replaced.
+     * 
+     * @param cents 
+     * @param interval
+     */
+    setInterval(cents: number, interval: Interval): void {
+        this.intervals[cents] = interval;
     }
 
     /**
@@ -38,7 +72,21 @@ export default class Melody {
      * 
      * @returns Interval[]
      */
-    getSelectedIntervals() {
-        return this.intervals.map((i) => i.match)
+    getSelectedIntervals(): Array<Interval> {
+        const intervals = [];
+        for (const c of this.cents) {
+            if (this.intervals[c.cents]) {
+                intervals.push(this.intervals[c.cents]!)
+            }
+        }
+        return intervals;
+    }
+
+    /**
+     * Get a list of unique frequency values from the melody.
+     * @returns number[]
+     */
+    getUniqueFrequencies(): number[] {
+        return [...new Set(this.frequencies.map((f) => f.frequency))];
     }
 }

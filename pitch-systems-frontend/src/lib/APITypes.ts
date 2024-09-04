@@ -15,7 +15,10 @@ export type Cents = {
 export type Interval = {
     id: number,
     name: string,
-    cents: number
+    cents: number,
+    ratio: string|null,
+    description: string|null,
+    additional_names?: string[]
 }
 
 export type Scale = {

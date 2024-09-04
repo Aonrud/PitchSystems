@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { Frequency } from "$lib/APITypes";
+import type { Frequency } from "$lib/APITypes";
 
-export let freq_list: Frequency[];
+export let list: Frequency[];
 
 //Graph scale
 //Set inverted so contents will expand (saves checking for first case)
-let min = 1000;
-let max = 0;
+let min = 200;
+let max = 200;
 
 //Scale padding
 const p_top = 10;
@@ -21,21 +21,13 @@ const setMin = (num: number) => {
 };
 
 const getWidth = (freq: Frequency) => {
-  const total = freq_list.reduce((sum, frequency) => {
-    console.log(sum);
-    console.log(frequency)
+  const total = list.reduce((sum, frequency) => {
     return { "slices": sum.slices + frequency.slices}
   }, {"slices": 0}).slices;
-
-  console.log(`Total: ${total}`)
   return (freq.slices/total) * 100;
 }
 </script>
-
-<div id="frequencies" class="flex h-60 border-b border-stone-700 bg-white">
-  <div class="hidden">
-    {freq_list}
-  </div>
+<div id="frequencies" class="flex h-60 border-b border-stone-700 bg-white" >
   <div
     class="z-50 flex w-3 flex-col justify-between border-l border-stone-700 text-xs text-stone-500"
   >
@@ -43,7 +35,7 @@ const getWidth = (freq: Frequency) => {
     <div class="-rotate-90">Hertz</div>
     <div>{min}</div>
   </div>
-  {#each freq_list as freq}
+  {#each list as freq}
     {#if freq.frequency > max - p_top}
       {setMax(freq.frequency + p_top)}
     {/if}
