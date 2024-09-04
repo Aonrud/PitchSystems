@@ -6,6 +6,7 @@
 
 # Private values
 .env
+.env.*
 
 #Local reference files
 misc_files/
@@ -19,4 +20,3 @@ staticfiles/
 
 #JS
 node_modules/
-.svelte-kit/
