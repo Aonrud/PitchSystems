@@ -122,9 +122,12 @@ class ScaleViewset(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # The unison interval is tautologically a part of every scale, so is not defined on Scale objects.
-        # It is however included in the Interval data for completeness.
+        # It is however included in the default Interval data for completeness.
         # Therefore, if requests include it, it is dropped from the search.
-        unison_id = Interval.objects.get(cents="0").id
+        unison_int = Interval.objects.get(cents="0")
+        unison_id = -1 # If not present, an impossible ID
+        if unison_int:
+            unison_id = unison_int.id
 
         queryset = Scale.objects.all()
         intervals = self.kwargs.get("intervals")
@@ -167,13 +170,15 @@ class NomenclatureViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = NomenclatureSerializer
+    queryset = Nomenclature.objects.all()
     
-    def get_queryset(self):
+    def get_term(self, request, *args, **kwargs):
         queryset = Nomenclature.objects.all()
 
         # Filter by term
         term = self.kwargs.get("term")
-        if term:
-            queryset = Interval.objects.filter(name.lower()==term.lower())
+        if term is not None:
+            queryset = Nomenclature.objects.get(name__iexact=term)
 
-        return queryset
+        result = self.serializer_class(queryset)
+        return Response(result.data)

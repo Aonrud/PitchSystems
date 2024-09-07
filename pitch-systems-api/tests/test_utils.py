@@ -1,5 +1,6 @@
 from django.test import TestCase
 import utils
+from decimal import Decimal
 
 
 class UtilsTest(TestCase):
@@ -19,7 +20,8 @@ class UtilsTest(TestCase):
         freq = utils.cents_above(self.freqs[0], 400)
         self.assertAlmostEqual(freq, self.freqs[1], 4)
 
-    def test_format_cents(self):
+    def test_format_number(self):
         cents = utils.cents_between(4, 5)
-        formatted = utils.format_cents(cents)
-        self.assertEqual(formatted, "386.3137")
+        expected =Decimal("386.3137")
+        formatted = utils.format_number(cents)
+        self.assertEqual(formatted, expected)

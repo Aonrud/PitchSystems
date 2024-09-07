@@ -19,5 +19,5 @@ urlpatterns = [
     path("systems/", SystemViewSet.as_view({'get': 'list'}), name="system_list"),
     path("system/<int:pk>/", SystemViewSet.as_view({'get': 'retrieve'}), name="system_single"),
     path("nomenclature/", NomenclatureViewSet.as_view({'get': 'list'}), name="nomenclature_list"),
-    path("nomenclature/<str:term>/", NomenclatureViewSet.as_view({'get': 'retrieve'}), name="nomenclature_single"),
+    path("nomenclature/<str:term>/", NomenclatureViewSet.as_view({'get': 'get_term'}), name="nomenclature_single"),
 ]

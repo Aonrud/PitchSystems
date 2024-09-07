@@ -4,6 +4,7 @@ from rest_framework.test import APITestCase
 from pitches.models import *
 from django.utils.http import urlencode
 from django.core import exceptions
+import utils
 
 
 def reverse_querystring(
@@ -36,11 +37,16 @@ test_intervals = [
         description="A 12-ET perfect fifth",
         cents=700,
     ),
+    Interval.objects.create(name="Unison", description="Unison case", cents=0),
 ]
 
 test_system = System.objects.create(
     name="12-Tone Equal Temperament",
     description="Divides the octave into 12 equal semitones of 100 cents.",
+)
+
+test_nomenclature = Nomenclature.objects.create(
+    name="Term", description="Term definition"
 )
 
 
@@ -55,10 +61,17 @@ class FrequencyTests(APITestCase):
             reverse("frequency_cents", kwargs={"frequencies": self.freqs_valid})
         )
         expected = [
-            {"cents": "-701.9550", "f1": "392.4384", "f2": "261.6256"},
-            {"cents": "-315.6413", "f1": "392.4384", "f2": "327.0320"},
-            {"cents": "0.0000", "f1": "392.4384", "f2": "392.4384"},
+            {"cents": -701.955, "f1": 392.4384, "f2": 261.6256},
+            {"cents": -315.6413, "f1": 392.4384, "f2": "327.0320"},
+            {"cents": 0.0, "f1": 392.4384, "f2": 392.4384},
         ]
+
+        # Pass through the format utility
+        for f in expected:
+            f["cents"] = utils.format_number(f["cents"])
+            f["f1"] = utils.format_number(f["f1"])
+            f["f2"] = utils.format_number(f["f2"])
+
         self.assertEqual(response.data, expected)
 
     def test_frequency_view_with_root_valid(self):
@@ -74,6 +87,13 @@ class FrequencyTests(APITestCase):
             {"cents": "386.3137", "f1": "261.6256", "f2": "327.0320"},
             {"cents": "701.9550", "f1": "261.6256", "f2": "392.4384"},
         ]
+
+        # Pass through the format utility
+        for f in expected:
+            f["cents"] = utils.format_number(f["cents"])
+            f["f1"] = utils.format_number(f["f1"])
+            f["f2"] = utils.format_number(f["f2"])
+
         self.assertEqual(response.data, expected)
 
     def test_frequency_view_invalid(self):
@@ -171,8 +191,9 @@ class ScaleTests(APITestCase):
                 system=cls.system,
             ),
         ]
+        # Test scales do not include the unison interval
         cls.scales[0].intervals.set([cls.intervals[0]])
-        cls.scales[1].intervals.set(cls.intervals)
+        cls.scales[1].intervals.set([cls.intervals[0], cls.intervals[1]])
 
     def test_api_scales_listview(self):
         response = self.client.get(reverse("scale_list"))
@@ -188,7 +209,7 @@ class ScaleTests(APITestCase):
         self.assertContains(response, self.scales[0])
 
     def test_api_scales_filter_intervals_valid(self):
-        interval_ids = [i.id for i in self.intervals]
+        interval_ids = [i.id for i in self.intervals if i.cents != 0]
 
         # A valid request for both test intervals should return only the second scale
         response = self.client.get(
@@ -197,6 +218,18 @@ class ScaleTests(APITestCase):
                 kwargs={"intervals": ",".join(list(map(str, interval_ids)))},
             )
         )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_api_scales_filter_intervals_drop_unison(self):
+        interval_ids = [i.id for i in self.intervals]
+        response = self.client.get(
+            reverse(
+                "scale_intervals",
+                kwargs={"intervals": ",".join(list(map(str, interval_ids)))},
+            )
+        )
+        # Response should be the same as test_api_scales_filter_intervals_valid, in which unison was excluded
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
@@ -211,3 +244,42 @@ class ScaleTests(APITestCase):
             )
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class SystemTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.system = test_system
+        cls.system.save()
+
+    def test_system_listview(self):
+        response = self.client.get(reverse("system_list"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, self.system)
+
+    def test_system_detailview(self):
+        response = self.client.get(
+            reverse("system_single", kwargs={"pk": self.system.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, self.system)
+
+
+class NomenclatureTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.nomenclature = test_nomenclature
+        cls.nomenclature.save()
+
+    def test_nomenclature_listview(self):
+        response = self.client.get(reverse("nomenclature_list"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, self.nomenclature)
+
+    def test_system_detailview_matchedcase_valid(self):
+        term = "Term"
+        response = self.client.get(
+            reverse("nomenclature_single", kwargs={"term": term})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, self.nomenclature)
