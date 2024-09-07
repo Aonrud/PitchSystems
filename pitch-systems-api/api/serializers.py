@@ -3,16 +3,31 @@ from pitches.models import *
 from drf_spectacular.utils import extend_schema, OpenApiParameter   
 
 class IntervalNameSerializer(serializers.ModelSerializer):
-    # system = serializers.StringRelatedField()
+    system = serializers.StringRelatedField()
 
     class Meta:
         model = IntervalName
         fields = ("id", "name", "description", "system")
 
+class SystemSerializer(serializers.ModelSerializer):
+    """
+    A Pitch System.
+    """
+    class Meta:
+        model = System
+        fields = ("id", "name", "description")
+
+class NomenclatureSerializer(serializers.ModelSerializer):
+    """
+    A term in the nomenclature.
+    """
+    class Meta:
+        model = Nomenclature
+        fields = ("id", "name", "description")
 
 class IntervalSerializer(serializers.ModelSerializer):
     """
-    Serializes an interval with full information.
+    An interval.
     """
 
     ratio: str = serializers.SerializerMethodField()
@@ -27,7 +42,7 @@ class IntervalSerializer(serializers.ModelSerializer):
     # if system_id:
     #     name = [o for o in additional_names.data if o.system == system_id][0]
 
-    def get_ratio(self, obj) -> str:
+    def get_ratio(self, obj) -> str|None:
         if obj.ratio_numerator is None:
             return None
         else:
@@ -37,10 +52,9 @@ class IntervalSerializer(serializers.ModelSerializer):
         model = Interval
         fields = ("id", "name", "description", "cents", "ratio", "additional_names")
 
-
 class ScaleSerializer(serializers.ModelSerializer):
     intervals = IntervalSerializer(many=True, read_only=True)
-    # system = serializers.StringRelatedField()
+    system = SystemSerializer()
 
     class Meta:
         model = Scale
@@ -49,15 +63,7 @@ class ScaleSerializer(serializers.ModelSerializer):
 
 class FrequencySerializer(serializers.Serializer):
     """
-    Serializer to validate frequency list URL parameter
+    A valid frequency number.
     """
 
     value = serializers.FloatField(required=True)
-
-class BasicSerializer(serializers.Serializer):
-    """
-    Serializer for models that only have the base model fields.
-    """
-    class Meta:
-        model = AbstractBaseModel
-        fields = ("id", "name", "description")

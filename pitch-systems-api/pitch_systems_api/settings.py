@@ -49,7 +49,7 @@ SPECTACULAR_SETTINGS = {
 
 # Custom settings for default values
 PS_SETTINGS = {
-    "CENTS_TOLERANCE": 3,
+    "CENTS_TOLERANCE": 10,
     "LIST_STRING_SEPARATOR": ",", # Note: '+' will be parsed as a space in queries, but not url slugs
 }
 

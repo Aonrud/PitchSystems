@@ -23,7 +23,6 @@ class FrequencyView(views.APIView):
     serializer_class = FrequencySerializer
 
     def get(self, request, **kwargs):
-        tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
         frequencies = self.kwargs["frequencies"].split(
             settings.PS_SETTINGS["LIST_STRING_SEPARATOR"]
         )
@@ -50,6 +49,9 @@ class FrequencyView(views.APIView):
                     "f2": utils.format_number(freq),
                 }
             )
+        # Get a unique list. Close frequency values can become duplicates after rounding with format_number().
+        cents = list({f"{val['f1']}-{val['f2']}":val for val in cents}.values())
+
         return Response(cents)
 
 
@@ -87,7 +89,7 @@ class IntervalViewset(viewsets.ReadOnlyModelViewSet):
         An optional 'tolerance' URL parameter allows filtering how many cents difference is considered 'near'. Otherwise, the default is used.
         """
 
-        tolerance = 10
+        tolerance = settings.PS_SETTINGS["CENTS_TOLERANCE"]
 
         cents = self.kwargs["cents"]
         req_tolerance = self.request.query_params.get("tolerance")
@@ -145,15 +147,15 @@ class SystemViewSet(viewsets.ReadOnlyModelViewSet):
     Get a pitch system by id, or the full list.
     """
 
-    serializer_class = BasicSerializer
+    serializer_class = SystemSerializer
     queryset = System.objects.all()
 
 class NomenclatureViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Get a pitch system by id, or the full list.
+    Get nomenclature entries or an individual term.
     """
 
-    serializer_class = BasicSerializer
+    serializer_class = NomenclatureSerializer
     
     def get_queryset(self):
         queryset = Nomenclature.objects.all()
@@ -161,6 +163,6 @@ class NomenclatureViewSet(viewsets.ReadOnlyModelViewSet):
         # Filter by term
         term = self.kwargs.get("term")
         if term:
-            queryset = Interval.objects.filter(name=term)
+            queryset = Interval.objects.filter(name.lower()==term.lower())
 
         return queryset
