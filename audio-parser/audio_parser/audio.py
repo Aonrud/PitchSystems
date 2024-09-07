@@ -90,7 +90,7 @@ class AudioParser:
         except OSError:
             raise Exception("Can't read configuration file. Please check it exists and is readable.")
 
-        self.applySettings(config)
+        self.apply_settings(config)
 
         if None in self.settings.values():
             # Can't have empty settings in the default config
@@ -103,7 +103,7 @@ class AudioParser:
         self.notes_sent = 0
         self.below_prob = 0
 
-    def applySettings(self, settings: dict):
+    def apply_settings(self, settings: dict):
         """
         Apply a settings dict.
         """

@@ -33,8 +33,8 @@ class SocketHandler:
         Create the websocket in 'port' mode.
         """
         print(f"Listening at {self.host}:{self.port}")
-        async with websockets.serve(self.handler, host=self.host, port=self.port):
-            await asyncio.Future()
+        async with websockets.serve(self.handler, host=self.host, port=self.port, ping_timeout=60):
+            await asyncio.get_running_loop().create_future() 
 
     async def connect_socket(self):
         """
@@ -53,32 +53,25 @@ class SocketHandler:
             self.handler,
             path=socket,
         ):
-            await asyncio.Future()  # run forever
+            await asyncio.get_running_loop().create_future() 
 
     async def handler(self, websocket):
         async for message in websocket:
-            if isinstance(message, str):
-                await self.message(message, websocket)
-            else:
-                pass # No binary messages expected on this interface, so discard
+            try:
+                data = json.loads(message)
+                if data["url"]:
+                    audio = AudioUrlHandler(url=data["url"])
+                    parser = AudioParser("config.yaml")
 
-    async def message(self, message: str, websocket):
-        try:
-            data = json.loads(message)
-            if data["url"]:
+                    # Check if any settings adjustments have been passed
+                    if "settings" in data:
+                        parser.apply_settings(data["settings"])
 
-                audio = AudioUrlHandler(url=data["url"])
-                parser = AudioParser("config.yaml")
-
-                # Check if any settings adjustments have been passed
-                if "settings" in data:
-                    parser.applySettings(data["settings"])
-
-                # Parse the audio
-                await parser.stream(audio.get(), websocket)
-        except json.JSONDecodeError:
-            await websocket.send(
-                json.dumps(
-                    {"status": "error", "message": "Received an invalid message."}
+                    # Parse the audio
+                    await parser.stream(audio.get(), websocket)
+            except json.JSONDecodeError:
+                await websocket.send(
+                    json.dumps(
+                        {"status": "error", "message": "Received an invalid message."}
+                    )
                 )
-            )
