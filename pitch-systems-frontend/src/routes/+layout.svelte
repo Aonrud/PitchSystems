@@ -1,18 +1,6 @@
 <script>
 import "../app.css";
 
-const footerLinks = [
-  {
-    url: "/",
-    title: "Back to the homepage",
-    text: "Home",
-  },
-  {
-    url: "/about/",
-    title: "About Pitch Systems",
-    text: "About",
-  },
-];
 </script>
 
 <div
@@ -31,14 +19,6 @@ const footerLinks = [
   </main>
 
   <footer class="py-6">
-    <nav>
-      <ul class="flex list-none flex-row gap-x-4">
-        {#each footerLinks as link}
-          <li>
-            <a href={link.url} title={link.title}>{link.text}</a>
-          </li>
-        {/each}
-      </ul>
-    </nav>
+
   </footer>
 </div>

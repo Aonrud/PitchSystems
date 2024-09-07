@@ -105,7 +105,7 @@ const discard = (id: string) => {
 >
 {#if form?.error}<p class="error">Error uploading file.</p>{/if}
   <div> 
-    <label class="block" for="file">Upload an audio file</label>
+    <label class="block" for="file">Select a file on your device.</label>
     <input
       class="border-stone- m-4"
       id="file"
