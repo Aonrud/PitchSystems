@@ -48,7 +48,7 @@ const getWidth = (freq: Frequency) => {
         class="w-full border-t border-stone-700 bg-stone-100"
         style="height: {Math.floor(((freq.frequency-min)/(max-min))*100)}%"
       >
-        <div class="text-center text-xs text-stone-500">{freq.frequency.toFixed(2)}</div>
+        <div class="text-center text-xs text-stone-600">{freq.frequency.toFixed(2)}</div>
       </div>
     </div>
   {/each}

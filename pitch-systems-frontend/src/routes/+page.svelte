@@ -9,6 +9,8 @@ import Analysis from "./Analysis.svelte";
 import { browser } from "$app/environment";
 import { PUBLIC_PARSER_SOCKET } from '$env/static/public';
 import * as utils from "$lib/MelodyUtils"
+import { Upload } from "lucide-svelte";
+import colours from "tailwindcss/colors";
 
 export let form;
 
@@ -16,6 +18,7 @@ let melody: Melody;
 let psclient = new PSClient();
 let saved_list: Melody[] = [];
 let messages: string[] = [];
+let description: string;
 
 const formSubmit = () => {
   // @ts-ignore Object and Function for the Svelte enhance callback
@@ -91,12 +94,14 @@ const discard = (id: string) => {
   <title>Pitch Systems: Analyse Musical Tunings</title>
 </svelte:head>
 
+<details id="upload-form" open>
+  <summary class="cursor-pointer list-none flex justify-center text-stone-800 text-lg">Analyse a new audio file <span class="pl-4"><Upload color={colours.stone["600"]} /></span></summary>
 <form
   method="post"
   action="?/upload"
   use:enhance={formSubmit}
   enctype="multipart/form-data"
-  class="m-4 mx-auto max-w-sm bg-white p-4 text-center shadow dark:bg-stone-800"
+  class="m-4 mx-auto max-w-sm bg-white p-4 text-center shadow"
 >
 {#if form?.error}<p class="error">Error uploading file.</p>{/if}
   <div> 
@@ -114,30 +119,38 @@ const discard = (id: string) => {
     class="
     p-2 rounded-md border
     border-emerald-900 bg-emerald-700 text-emerald-50
-    hover:border-emerald-900 hover:bg-emerald-600
-    dark:border-emerald-500 dark:bg-emerald-400 dark:text-emerald-900
-    dark:hover:border-emerald-500 dark:hover:bg-emerald-200"
+    hover:border-emerald-900 hover:bg-emerald-600"
     type="submit"
     >Analyze Audio
   </button>   
 </form>
+</details>
 
 {#if melody}
 <article>
   <header class="my-4 flex justify-between">
-    <h3 class="text-xl font-semibold">{melody.name}</h3>
+    <h2 class="text-2xl font-bold">{melody.name}</h2>
     <div>
-      <button on:click={() => save(melody)} title="Save this analysis to local storage.">Save</button>
-      <button on:click={() => discard(melody.id)} title="Remove this analysis from local storage.">Discard</button>
+      <button on:click={() => save(melody)} class="p-2 rounded-md border border-emerald-200 bg-emerald-50" title="Save this analysis to local storage.">Save</button>
+      <button on:click={() => discard(melody.id)} class="p-2 rounded-md border border-red-200 bg-red-50" title="Remove this analysis from local storage.">Discard</button>
     </div>
   </header>
+  {#if description}
+    <h3 class="text-xl my-4">About This Example</h3>
+    <p class="text-lg">{description}</p>
+  {/if}
+  <div class="my-4 w-full">
+    <audio class="mx-auto" src={melody.path} controls>
+      <p>The audio recording analysed. If playback is unavailable, <a href="{melody.path}">download here</a>.</p>
+    </audio>
+  </div>
   <Frequencies list={melody.frequencies} />
   <Analysis bind:melody {psclient} />
 </article>
 {/if}
 
 {#if browser}
-  <Saved bind:melody bind:saved_list />
+  <Saved bind:melody bind:saved_list bind:description />
 {/if}
 
 <!--User Messages display-->

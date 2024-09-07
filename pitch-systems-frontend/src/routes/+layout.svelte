@@ -16,14 +16,14 @@ const footerLinks = [
 </script>
 
 <div
-  class="container mx-auto my-8 max-w-screen-md rounded-md bg-stone-50 p-6 shadow dark:bg-stone-900"
+  class="container relative mx-auto my-8 max-w-screen-md rounded-md bg-stone-50 p-6 shadow"
 >
   <header class="py-8">
-    <div
-      class="p-6 text-center font-serif text-5xl text-emerald-900 dark:text-emerald-200"
+    <h1
+      class="p-6 text-center font-serif text-5xl text-emerald-900"
     >
       Pitch Systems
-    </div>
+  </h1>
   </header>
 
   <main class="flex-grow">

@@ -23,5 +23,14 @@ export type Interval = {
 
 export type Scale = {
     id: number,
-    name: string
+    name: string,
+    description: string|null,
+    intervals: Interval[],
+    system: BaseApiItem
+}
+
+export type BaseApiItem = {
+    id: number,
+    name: string,
+    description: string
 }
