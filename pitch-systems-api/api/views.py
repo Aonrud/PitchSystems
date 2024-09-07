@@ -121,6 +121,11 @@ class ScaleViewset(viewsets.ReadOnlyModelViewSet):
     serializer_class = ScaleSerializer
 
     def get_queryset(self):
+        # The unison interval is tautologically a part of every scale, so is not defined on Scale objects.
+        # It is however included in the Interval data for completeness.
+        # Therefore, if requests include it, it is dropped from the search.
+        unison_id = Interval.objects.get(cents="0").id
+
         queryset = Scale.objects.all()
         intervals = self.kwargs.get("intervals")
         if intervals is not None:
@@ -133,13 +138,19 @@ class ScaleViewset(viewsets.ReadOnlyModelViewSet):
                     {"error": "Invalid id value. Not an integer."}
                 )
 
-            intersections = [
-                Scale.objects.filter(intervals=interval)
-                for interval in intervals_valid[1:]
-            ]
-            queryset = Scale.objects.filter(intervals=intervals_valid[0]).intersection(
-                *intersections
-            )
+            #Drop the unison interval id
+            intervals_valid = [id for id in intervals_valid if id != unison_id]
+
+            #Check other intervals remain
+            if len(intervals_valid) > 0:
+                # Find all scales that include the first interval and get the intersection with all scales that include each subsequent interval.
+                intersections = [
+                    Scale.objects.filter(intervals=interval)
+                    for interval in intervals_valid[1:]
+                ]
+                queryset = Scale.objects.filter(intervals=intervals_valid[0]).intersection(
+                    *intersections
+                )
         return queryset
 
 class SystemViewSet(viewsets.ReadOnlyModelViewSet):
