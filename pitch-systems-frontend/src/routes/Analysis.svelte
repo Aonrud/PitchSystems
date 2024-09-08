@@ -88,7 +88,7 @@ const removeHandler = async (item: Cents) => {
       </p>
       <div>
         <label for="root-select">Selected root:</label>
-        <select class="p-2 bg-white border border-stone-200"
+        <select class="p-2 bg-white border border-stone-200 hover:bg-stone-200 focus:bg-stone-200 cursor-pointer"
           id="root-select"
           bind:value={melody.root}
           on:change={() => {
@@ -114,19 +114,22 @@ const removeHandler = async (item: Cents) => {
           <div class="relative mx-8 flex-grow py-4">
             <button
               title="Select an alternative match"
-              class="flex w-full justify-between"
+              class="flex w-full justify-between p-4 -m-4 group"
               on:click={(e) => {
                         intervalSelection(e, item);
                     }}
             >
               {@html showMatch(item)}
-              <SquareChevronDown color={colours.stone["400"]} />
+              <span class="text-stone-400 group-hover:text-stone-700">
+              <SquareChevronDown />
+            </span>
             </button>
           </div>
           <div class="py-4">
             <button
               on:click={() => removeHandler(item)}
               title="Remove this interval from the analysis."
+              class="hover:text-red-900 focus:text-red-900 -m-4 p-4"
               >Remove
             </button>
           </div>
@@ -139,11 +142,11 @@ const removeHandler = async (item: Cents) => {
       <p class="my-4">Scales that include the selected intervals.</p>
       {#each melody.scales as scale}
         <details class="my-4 bg-white px-2 py-4 [&_svg]:open:-rotate-180">
-          <summary class="flex cursor-pointer list-none gap-2 justify-between">
+          <summary class="flex cursor-pointer list-none gap-2 justify-between group">
             <h4 class="text-lg font-semibold" title="Expand scale details.">
               {scale.name}
             </h4>
-            <ChevronDown color={colours.stone["400"]} />
+            <span class="text-stone-400 group-hover:text-stone-700"><ChevronDown /></span>
           </summary>
           {#if scale.description}
             <p class="my-4">{scale.description}</p>
