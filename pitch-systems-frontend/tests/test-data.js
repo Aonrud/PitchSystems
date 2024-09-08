@@ -1,6 +1,5 @@
 
 import Melody from "$lib/Melody"
-import Frequencies from "../src/routes/Frequencies.svelte";
 
 //Set up a melody object with sample data
 let melody = new Melody("id-1", "Testing melody", "/dev/null");
@@ -111,85 +110,40 @@ export const cents = [
 ];
 melody.cents = cents;
 
-export const intervals = [
-    {
-        "cents": 0,
-        "match": {
-            "id": 1,
-            "name": "Unison",
-            "description": null,
-            "cents": 0,
-            "ratio": "1:1",
-            "additional_names": []
+export const intervals = {
+    "0": {
+      "id": 1,
+      "name": "Unison",
+      "description": null,
+      "cents": 0,
+      "ratio": "1:1",
+      "additional_names": [
+        {
+          "id": 7,
+          "name": "Perfect prime",
+          "description": null,
+          "system": null
         }
+      ]
     },
-    {
-        "cents": 200,
-        "match": {
-            "id": 6,
-            "name": "12-ET Major Second",
-            "description": null,
-            "cents": 200,
-            "ratio": null,
-            "additional_names": []
-        }
+    "200": {
+      "id": 597,
+      "name": "12-ET Major Second",
+      "description": null,
+      "cents": 200,
+      "ratio": null,
+      "additional_names": []
     },
-    {
-        "cents": 400,
-        "match": {
-            "id": 13,
-            "name": "12-ET Major Third",
-            "description": null,
-            "cents": 400,
-            "ratio": null,
-            "additional_names": []
-        }
-    },
-    {
-        "cents": 700,
-        "match": {
-            "id": 21,
-            "name": "12-ET Fifth",
-            "description": null,
-            "cents": 700,
-            "ratio": null,
-            "additional_names": []
-        }
-    },
-    {
-        "cents": 900,
-        "match": {
-            "id": 27,
-            "name": "12-ET Major Sixth",
-            "description": null,
-            "cents": 900,
-            "ratio": null,
-            "additional_names": []
-        }
-    },
-    {
-        "cents": 1100,
-        "match": {
-            "id": 33,
-            "name": "12-ET Major Seventh",
-            "description": null,
-            "cents": 1100,
-            "ratio": null,
-            "additional_names": []
-        }
-    },
-    {
-        "cents": 1200,
-        "match": {
-            "id": 35,
-            "name": "Octave",
-            "description": null,
-            "cents": 1200,
-            "ratio": "2:1",
-            "additional_names": []
-        }
-    },
-];
+    "700": {
+      "id": 602,
+      "name": "12-ET Fifth",
+      "description": null,
+      "cents": 700,
+      "ratio": null,
+      "additional_names": []
+    }
+  }
+
 melody.intervals = intervals;
 
 export { melody }

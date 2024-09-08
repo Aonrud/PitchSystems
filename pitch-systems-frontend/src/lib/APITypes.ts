@@ -18,7 +18,14 @@ export type Interval = {
     cents: number,
     ratio: string|null,
     description: string|null,
-    additional_names?: string[]
+    additional_names?: IntervalName[]
+}
+
+export type IntervalName = {
+    id: number,
+    name: string,
+    description: string|null,
+    system: string|null
 }
 
 export type Scale = {
