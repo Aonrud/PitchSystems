@@ -25,6 +25,7 @@ const formSubmit = () => {
   return ({ result, update }) => {
     if (result.type === "success") {
       queue_message(`Analysing frequencies in "${result.data.file.name}"`);
+      description = "";
       melody = new Melody(
         result.data.file.uuid,
         result.data.file.name,
@@ -156,8 +157,10 @@ const discard = (id: string) => {
         <button
           on:click={() => save(melody)}
           class="flex rounded-md border border-emerald-200 bg-emerald-50 p-2
-        hover:bg-emerald-100 focus:bg-emerald-100"
+        hover:bg-emerald-100 focus:bg-emerald-100
+        disabled:bg-stone-100 disabled:text-stone-600  disabled:cursor-wait"
           title="Save this analysis to local storage."
+          disabled={melody.pending}
         >
           <Save color={colours.emerald["400"]} />
           <span class="pl-2">Save</span>
@@ -165,8 +168,10 @@ const discard = (id: string) => {
         <button
           on:click={() => discard(melody.id)}
           class="flex rounded-md border border-red-200 bg-red-50 p-2
-        hover:bg-red-100 focus:bg-red-100"
+        hover:bg-red-100 focus:bg-red-100
+        disabled:bg-stone-100 disabled:text-stone-600 disabled:cursor-wait"
           title="Remove this analysis from local storage."
+          disabled={melody.pending}
         >
           <OctagonX color={colours.red["400"]} />
           <span class="pl-2">Discard</span>

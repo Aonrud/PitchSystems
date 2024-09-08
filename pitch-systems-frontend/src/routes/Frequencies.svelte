@@ -27,14 +27,14 @@ const getWidth = (freq: Frequency) => {
   return (freq.slices/total) * 100;
 }
 </script>
-<div id="frequencies" class="flex h-60 border-b border-stone-700 bg-white" >
-  <div
+<ul id="frequencies" class="flex h-60 border-b border-stone-700 bg-white" >
+  <li
     class="z-50 flex w-3 flex-col justify-between border-l border-stone-700 text-xs text-stone-500"
   >
     <div>{max}</div>
     <div class="-rotate-90">Hertz</div>
     <div>{min}</div>
-  </div>
+</li>
   {#each list as freq}
     {#if freq.frequency > max - p_top}
       {setMax(freq.frequency + p_top)}
@@ -42,7 +42,7 @@ const getWidth = (freq: Frequency) => {
     {#if freq.frequency < min + p_bottom}
       {setMin(freq.frequency -p_bottom)}
     {/if}
-    <div class="flex grow flex-col justify-end overflow-hidden" style="width: {getWidth(freq)}%" data-slices="{freq.slices}" data-start="{freq.start}">
+    <li class="flex grow flex-col justify-end overflow-hidden" style="width: {getWidth(freq)}%" data-slices="{freq.slices}" data-start="{freq.start}">
       <div
         title="{freq.frequency.toString()}Hz"
         class="w-full border-t border-stone-700 bg-stone-100"
@@ -50,6 +50,6 @@ const getWidth = (freq: Frequency) => {
       >
         <div class="text-center text-xs text-stone-600">{freq.frequency.toFixed(2)}</div>
       </div>
-    </div>
+    </li>
   {/each}
-</div>
+  </ul>
