@@ -49,8 +49,9 @@ class FrequencyView(views.APIView):
                     "f2": utils.format_number(freq),
                 }
             )
-        # Get a unique list. Close frequency values can become duplicates after rounding with format_number().
+        # Get a unique list, sorted by interval. Close frequency values can become duplicates after rounding with format_number().
         cents = list({f"{val['f1']}-{val['f2']}":val for val in cents}.values())
+        cents = sorted(cents, key=lambda c: c["cents"])
 
         return Response(cents)
 
